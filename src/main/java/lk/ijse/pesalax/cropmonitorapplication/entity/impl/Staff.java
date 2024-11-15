@@ -1,7 +1,7 @@
-package lk.ijse.pesalax.cropmonitor_application_backend.entity.impl;
+package lk.ijse.pesalax.cropmonitorapplication.entity.impl;
 
 import jakarta.persistence.*;
-import lk.ijse.pesalax.cropmonitor_application_backend.entity.SuperEntity;
+import lk.ijse.pesalax.cropmonitorapplication.entity.SuperEntity;
 import lombok.*;
 
 import java.util.ArrayList;

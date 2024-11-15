@@ -1,6 +1,6 @@
-package lk.ijse.pesalax.cropmonitor_application_backend.dto.impl;
+package lk.ijse.pesalax.cropmonitorapplication.dto.impl;
 
-import lk.ijse.pesalax.cropmonitor_application_backend.dto.CropStatus;
+import lk.ijse.pesalax.cropmonitorapplication.dto.CropStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
