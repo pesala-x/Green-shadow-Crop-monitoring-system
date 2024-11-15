@@ -1,4 +1,4 @@
-package lk.ijse.pesalax.cropmonitorapplication.entity;
+package lk.ijse.pesalax.cropmonitor_application_backend.entity;
 
 import java.io.Serializable;
 

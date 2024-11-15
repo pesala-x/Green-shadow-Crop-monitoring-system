@@ -1,4 +1,4 @@
-package lk.ijse.pesalax.cropmonitorapplication;
+package lk.ijse.pesalax.cropmonitor_application_backend;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.SpringApplication;
