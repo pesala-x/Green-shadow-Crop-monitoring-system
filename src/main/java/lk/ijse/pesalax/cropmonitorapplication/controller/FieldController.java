@@ -2,6 +2,7 @@ package lk.ijse.pesalax.cropmonitorapplication.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lk.ijse.pesalax.cropmonitorapplication.customObj.FieldErrorResponse;
+import lk.ijse.pesalax.cropmonitorapplication.customObj.FieldResponse;
 import lk.ijse.pesalax.cropmonitorapplication.dto.impl.FieldDTO;
 import lk.ijse.pesalax.cropmonitorapplication.exception.DataPersistException;
 import lk.ijse.pesalax.cropmonitorapplication.service.FieldService;
@@ -65,21 +66,26 @@ public class FieldController {
             fieldService.saveField(fieldDTO);
 
             // Return success response
-            return new ResponseEntity<>(new FieldErrorResponse("success", "Field saved successfully"), HttpStatus.CREATED);
+            return new ResponseEntity<>(new FieldErrorResponse(0, "Field saved successfully"), HttpStatus.CREATED);
 
         } catch (DataPersistException e) {
             // Handle specific persistence error
-            return new ResponseEntity<>(new FieldErrorResponse("error", "Failed to save field: " + e.getMessage()), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new FieldErrorResponse(0, "Failed to save field: " + e.getMessage()), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             // Handle general exceptions
             e.printStackTrace(); // Log the error
-            return new ResponseEntity<>(new FieldErrorResponse("error", "Internal server error"), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(new FieldErrorResponse(0, "Internal server error"), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @GetMapping(value = "allFields", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<FieldDTO> getAllFields() {
         return fieldService.getAllFields();
+    }
+
+    @GetMapping(value = "/{code}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public FieldResponse getSelectedField(@PathVariable("code") String code) {
+        return fieldService.getSelectedField(code);
     }
 }
 

@@ -1,5 +1,7 @@
 package lk.ijse.pesalax.cropmonitorapplication.service.impl;
 
+import lk.ijse.pesalax.cropmonitorapplication.customObj.FieldErrorResponse;
+import lk.ijse.pesalax.cropmonitorapplication.customObj.FieldResponse;
 import lk.ijse.pesalax.cropmonitorapplication.dao.FieldDAO;
 import lk.ijse.pesalax.cropmonitorapplication.dto.impl.FieldDTO;
 import lk.ijse.pesalax.cropmonitorapplication.entity.impl.Field;
@@ -34,5 +36,25 @@ public class FieldServiceIMPL implements FieldService {
     public List<FieldDTO> getAllFields() {
         List<Field> getAllFields = fieldDAO.findAll();
         return mapping.convertToFieldListDTO(getAllFields);
+    }
+
+    @Override
+    public FieldResponse getSelectedField(String fieldCode) {
+        if (fieldDAO.existsById(fieldCode)) {
+            Field fields = fieldDAO.getReferenceById(fieldCode);
+            return mapping.convertToFieldDTO(fields);
+        } else {
+            return new FieldErrorResponse(0, "Field not found");
+        }
+    }
+
+    @Override
+    public void deleteField(String fieldCode) {
+
+    }
+
+    @Override
+    public void updateField(String fieldCode, FieldDTO fieldDTO) {
+
     }
 }
