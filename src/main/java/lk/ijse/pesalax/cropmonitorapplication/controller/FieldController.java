@@ -18,8 +18,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "api/v1/fields")
 @RequiredArgsConstructor
+@RequestMapping(value = "api/v1/fields")
+@CrossOrigin(origins = "http://127.0.0.1:5501")
 public class FieldController {
     private final FieldService fieldService;
 
