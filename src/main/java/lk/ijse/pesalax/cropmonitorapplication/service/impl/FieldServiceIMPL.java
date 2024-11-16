@@ -52,7 +52,12 @@ public class FieldServiceIMPL implements FieldService {
 
     @Override
     public void deleteField(String fieldCode) {
-
+        Optional<Field> selectedField = fieldDAO.findById(fieldCode);
+        if (!selectedField.isPresent()) {
+            throw new FieldNotFoundException(fieldCode);
+        } else {
+            fieldDAO.deleteById(fieldCode);
+        }
     }
 
     @Override

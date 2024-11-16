@@ -5,6 +5,7 @@ import lk.ijse.pesalax.cropmonitorapplication.customObj.FieldErrorResponse;
 import lk.ijse.pesalax.cropmonitorapplication.customObj.FieldResponse;
 import lk.ijse.pesalax.cropmonitorapplication.dto.impl.FieldDTO;
 import lk.ijse.pesalax.cropmonitorapplication.exception.DataPersistException;
+import lk.ijse.pesalax.cropmonitorapplication.exception.FieldNotFoundException;
 import lk.ijse.pesalax.cropmonitorapplication.service.FieldService;
 import lk.ijse.pesalax.cropmonitorapplication.util.AppUtil;
 import lombok.RequiredArgsConstructor;
@@ -115,6 +116,18 @@ public class FieldController {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } catch (Exception e) {
             e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @DeleteMapping(value = "/{code}")
+    public ResponseEntity<Void> deleteSelectedField(@PathVariable("code") String code) {
+        try {
+            fieldService.deleteField(code);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (FieldNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
