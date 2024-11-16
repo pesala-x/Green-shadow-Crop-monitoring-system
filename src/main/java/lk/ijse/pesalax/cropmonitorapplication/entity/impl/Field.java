@@ -20,7 +20,9 @@ public class Field implements SuperEntity {
     private String fieldName;
     private String fieldLocation;
     private Double extentSize;
+    @Column(columnDefinition = "LONGTEXT")
     private String fieldImage1;
+    @Column(columnDefinition = "LONGTEXT")
     private String fieldImage2;
     @OneToMany(mappedBy = "field")
     private List<Crop> crops = new ArrayList<>();
