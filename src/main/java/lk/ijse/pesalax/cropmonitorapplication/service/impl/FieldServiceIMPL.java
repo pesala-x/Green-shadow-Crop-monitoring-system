@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -26,5 +28,11 @@ public class FieldServiceIMPL implements FieldService {
         } catch (DataPersistException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public List<FieldDTO> getAllFields() {
+        List<Field> getAllFields = fieldDAO.findAll();
+        return mapping.convertToFieldListDTO(getAllFields);
     }
 }
