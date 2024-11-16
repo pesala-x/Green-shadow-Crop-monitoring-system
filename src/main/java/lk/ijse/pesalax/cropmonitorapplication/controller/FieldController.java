@@ -87,5 +87,36 @@ public class FieldController {
     public FieldResponse getSelectedField(@PathVariable("code") String code) {
         return fieldService.getSelectedField(code);
     }
+
+    @PatchMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, value = "/{fieldCode}")
+    public ResponseEntity<Void> updateSelectedField(
+            @PathVariable("fieldCode") String fieldCode,
+            @RequestParam(value = "fieldName", required = false) String fieldName,
+            @RequestParam(value = "fieldLocation", required = false) String fieldLocation,
+            @RequestParam(value = "extentSize", required = false) Double extentSize,
+            @RequestParam(value = "fieldImage1", required = false) MultipartFile fieldImage1,
+            @RequestParam(value = "fieldImage2", required = false) MultipartFile fieldImage2
+    ) {
+        try {
+            FieldDTO fieldDTO = new FieldDTO();
+
+            if (fieldName != null) fieldDTO.setFieldName(fieldName);
+            if (fieldLocation != null) fieldDTO.setFieldLocation(fieldLocation);
+            if (extentSize != null) fieldDTO.setExtentSize(extentSize);
+
+            if (fieldImage1 != null && !fieldImage1.isEmpty()) {
+                fieldDTO.setFieldImage1(AppUtil.toBase64(fieldImage1.getBytes()));
+            }
+            if (fieldImage2 != null && !fieldImage2.isEmpty()) {
+                fieldDTO.setFieldImage2(AppUtil.toBase64(fieldImage2.getBytes()));
+            }
+
+            fieldService.updateField(fieldCode, fieldDTO);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }
 
