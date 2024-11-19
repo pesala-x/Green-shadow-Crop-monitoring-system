@@ -162,6 +162,57 @@
       </form>
     </div>
 
+    <!-- get all pop up -->
+    <div
+      class="modal fade"
+      id="fieldListModal"
+      tabindex="-1"
+      aria-labelledby="fieldListModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="fieldListModalLabel">All Fields</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div id="fieldList">
+              <table class="table table-bordered">
+                <thead class="table-success">
+                  <tr>
+                    <th>Field Code</th>
+                    <th>Field Name</th>
+                    <th>Location</th>
+                    <th>Size</th>
+                    <th>Crops</th>
+                    <th>Staff</th>
+                    <th>Image 1</th>
+                    <th>Image 2</th>
+                  </tr>
+                </thead>
+                <tbody id="fieldTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
