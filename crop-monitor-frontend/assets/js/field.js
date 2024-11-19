@@ -27,3 +27,19 @@ $(document).ready(function () {
     }
   });
 });
+
+// field code
+
+function generateFieldCode() {
+  const code = "F-" + Math.floor(1000 + Math.random() * 900);
+  document.getElementById("fieldCode").value = code;
+}
+
+$(document).ready(function () {
+  generateFieldCode();
+
+  $("#clearBtn").on("click", function () {
+    generateFieldCode();
+    $("#fieldForm")[0].reset();
+  });
+});
