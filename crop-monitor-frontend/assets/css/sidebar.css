@@ -126,6 +126,15 @@
   margin-top: 30px;
 }
 
+#content {
+  margin-left: 260px;
+  transition: margin-left 0.3s ease;
+}
+
+.sidebar.collapsed + #content {
+  margin-left: 70px;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .sidebar {
