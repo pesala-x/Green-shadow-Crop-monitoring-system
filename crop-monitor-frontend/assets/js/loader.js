@@ -7,5 +7,5 @@ document.addEventListener("DOMContentLoaded", function () {
   setTimeout(() => {
     loader.style.display = "none";
     mainContent.style.display = "block";
-  }, 1000); // Adjust the delay time as needed or remove for instant display
+  }, 100); // Adjust the delay time as needed or remove for instant display
 });
