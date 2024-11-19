@@ -23,34 +23,54 @@ body::before {
   width: 100%;
   padding: 30px;
 }
-h2 {
-  color: #2e7d32;
+h1 {
+  color: #ffffff;
   font-weight: bold;
   text-align: center;
   margin-top: 20px;
   margin-bottom: 20px;
+}
+.form-label{
+  color: #000;
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }
 .form-control,
 .form-select {
   margin-bottom: 15px;
   border: 1px solid #66bb6a;
   color: #1b5e20;
+  transition: all 0.3s ease-in-out; /* Smooth transition for focus effects */
 }
+
 .form-control:focus,
 .form-select:focus {
   border-color: #2e7d32;
-  box-shadow: none;
+  box-shadow: 0 0 10px 2px rgba(70, 189, 76, 0.5), 0 0 15px rgba(102, 187, 106, 0.5); /* Dual glowing effect */
+  outline: none; /* Removes default outline for better appearance */
 }
+
 .btn {
   width: 100%;
 }
 .btn-success {
-  background-color: #2e7d32;
-  border-color: #2e7d32;
+  background-color: #070907;
+  border-radius: 10px;
 }
 .btn-success:hover {
-  background-color: #1b5e20;
+  color: #000;
+  background-color: #ffffff;
+  box-shadow: 0 0 10px 2px rgba(13, 209, 239, 0.5), 0 0 15px rgba(102, 178, 187, 0.5); /* Dual glowing effect */
 }
+.btn-read {
+  background-color: #e83131;
+  border-radius: 10px;
+}
+.btn-read:hover {
+  color: #000;
+  background-color: #ffffff;
+  box-shadow: 0 0 10px 2px rgba(244, 17, 17, 0.5), 0 0 15px rgba(255, 110, 110, 0.708); /* Dual glowing effect */
+}
+
 .select2-container--default .select2-selection--multiple {
   background-color: #f1f8e9;
   border: 1px solid #66bb6a;
