@@ -25,6 +25,7 @@ body::before {
 }
 h1 {
   color: #ffffff;
+  font-family: Georgia, 'Times New Roman', Times, serif;
   font-weight: bold;
   text-align: center;
   margin-top: 20px;
