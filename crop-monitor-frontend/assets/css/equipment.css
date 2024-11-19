@@ -1,0 +1,20 @@
+body {
+  margin: 0;
+  position: relative; /* Ensures pseudo-element is positioned properly */
+  min-height: 100vh; /* Makes sure the body fills the viewport height */
+  color: white; /* Ensures text readability */
+  padding: 20px;
+}
+
+body::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url('/assets/img/dashboard_cover.jpg') no-repeat center center; /* Path to your image */
+  background-size: cover; /* Makes the image cover the entire section */
+  filter: blur(8px); /* Adjust the blur intensity */
+  z-index: -1; /* Ensures it stays behind the content */
+}

@@ -17,197 +17,208 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css"
     />
     <link rel="stylesheet" href="/assets/css/field.css" />
+    <link rel="stylesheet" href="/assets/css/sidebar.css" />
   </head>
   <body>
-    <div class="form-container">
-      <h2>Field Management</h2>
-      <form id="fieldForm">
-        <div class="row mb-3">
-          <div class="col-md-6">
-            <label for="fieldCode" class="form-label">Field Code</label>
-            <input type="text" class="form-control" id="fieldCode" readonly />
-          </div>
-          <div class="col-md-6">
-            <label for="fieldName" class="form-label">Field Name</label>
-            <input type="text" class="form-control" id="fieldName" required />
-          </div>
-        </div>
-        <div class="row mb-3">
-          <div class="col-md-6">
-            <label for="fieldLocation" class="form-label"
-              >Field Location (GPS Coordinates)</label
-            >
-            <input
-              type="text"
-              class="form-control"
-              id="fieldLocation"
-              required
-            />
-          </div>
-          <div class="col-md-6">
-            <label for="fieldSize" class="form-label"
-              >Field Size (Sq. meters)</label
-            >
-            <input type="number" class="form-control" id="fieldSize" required />
-          </div>
-        </div>
-        <div class="row mb-3">
-          <!-- crops -->
-          <div class="col-md-6">
-            <label for="crops" class="form-label">Crops</label>
-            <select
-              class="form-control"
-              id="crops"
-              multiple="multiple"
-              required
-            >
-              <option value="rice">Rice</option>
-              <option value="cowpea">Cowpea</option>
-              <option value="bean">Bean</option>
-              <option value="potato">Potato</option>
-              <option value="tomato">Tomato</option>
-            </select>
-          </div>
-          <div class="col-md-6">
-            <label for="staff" class="form-label">Allocated Staff</label>
-            <select class="form-select" id="staff" required>
-              <option value="" disabled selected>Select Staff</option>
-              <option value="no">Not Allocated</option>
-            </select>
-          </div>
-        </div>
+    <div id="sidebar-container"></div>
 
-        <!-- images -->
-        <div class="row mb-3">
-          <div class="col-md-6">
-            <label for="fieldImage1" class="form-label">Field Image 1</label>
-            <input
-              type="file"
-              class="form-control"
-              id="fieldImage1"
-              accept="image/*"
-            />
-            <img
-              id="previewImage1"
-              src="#"
-              alt="Image 1 Preview"
-              class="img-fluid mt-2"
-              style="display: none; max-height: 200px"
-            />
-          </div>
-          <div class="col-md-6">
-            <label for="fieldImage2" class="form-label">Field Image 2</label>
-            <input
-              type="file"
-              class="form-control"
-              id="fieldImage2"
-              accept="image/*"
-            />
-            <img
-              id="previewImage2"
-              src="#"
-              alt="Image 2 Preview"
-              class="img-fluid mt-2"
-              style="display: none; max-height: 200px"
-            />
-          </div>
-        </div>
-        <!-- Buttons -->
-        <div class="d-flex justify-content-between align-items-center">
-          <div class="d-flex gap-2">
-            <button
-              type="submit"
-              class="btn btn-success flex-grow-1"
-              id="saveBtn"
-              style="width: 100px"
-            >
-              Save
-            </button>
-            <button
-              type="button"
-              class="btn btn-primary flex-grow-1"
-              id="updateBtn"
-              style="width: 100px"
-            >
-              Update
-            </button>
-            <button
-              type="button"
-              class="btn btn-warning flex-grow-1"
-              id="clearBtn"
-              style="width: 100px"
-            >
-              Clear
-            </button>
-            <button
-              type="button"
-              class="btn btn-danger flex-grow-1"
-              id="deleteBtn"
-              style="width: 100px"
-            >
-              Delete
-            </button>
-          </div>
-          <button
-            type="button"
-            class="btn btn-info"
-            data-bs-toggle="modal"
-            data-bs-target="#fieldListModal"
-            id="getAllBtn"
-            style="width: 100px"
-          >
-            All Fields
-          </button>
-        </div>
-      </form>
-    </div>
-
-    <!-- get all pop up -->
-    <div
-      class="modal fade"
-      id="fieldListModal"
-      tabindex="-1"
-      aria-labelledby="fieldListModalLabel"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="fieldListModalLabel">All Fields</h5>
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
-          </div>
-          <div class="modal-body">
-            <div id="fieldList">
-              <table class="table table-bordered">
-                <thead class="table-success">
-                  <tr>
-                    <th>Field Code</th>
-                    <th>Field Name</th>
-                    <th>Location</th>
-                    <th>Size</th>
-                    <th>Crops</th>
-                    <th>Staff</th>
-                    <th>Image 1</th>
-                    <th>Image 2</th>
-                  </tr>
-                </thead>
-                <tbody id="fieldTableBody"></tbody>
-              </table>
+    <!-- Main Content -->
+    <div id="content" style="margin-left: 260px; margin-top: 60px">
+      <div class="form-container">
+        <h2>Field Management</h2>
+        <form id="fieldForm">
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label for="fieldCode" class="form-label">Field Code</label>
+              <input type="text" class="form-control" id="fieldCode" readonly />
+            </div>
+            <div class="col-md-6">
+              <label for="fieldName" class="form-label">Field Name</label>
+              <input type="text" class="form-control" id="fieldName" required />
             </div>
           </div>
-          <div class="modal-footer">
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label for="fieldLocation" class="form-label"
+                >Field Location (GPS Coordinates)</label
+              >
+              <input
+                type="text"
+                class="form-control"
+                id="fieldLocation"
+                required
+              />
+            </div>
+            <div class="col-md-6">
+              <label for="fieldSize" class="form-label"
+                >Field Size (Sq. meters)</label
+              >
+              <input
+                type="number"
+                class="form-control"
+                id="fieldSize"
+                required
+              />
+            </div>
+          </div>
+          <div class="row mb-3">
+            <!-- crops -->
+            <div class="col-md-6">
+              <label for="crops" class="form-label">Crops</label>
+              <select
+                class="form-control"
+                id="crops"
+                multiple="multiple"
+                required
+              >
+                <option value="rice">Rice</option>
+                <option value="cowpea">Cowpea</option>
+                <option value="bean">Bean</option>
+                <option value="potato">Potato</option>
+                <option value="tomato">Tomato</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label for="staff" class="form-label">Allocated Staff</label>
+              <select class="form-select" id="staff" required>
+                <option value="" disabled selected>Select Staff</option>
+                <option value="no">Not Allocated</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- images -->
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label for="fieldImage1" class="form-label">Field Image 1</label>
+              <input
+                type="file"
+                class="form-control"
+                id="fieldImage1"
+                accept="image/*"
+              />
+              <img
+                id="previewImage1"
+                src="#"
+                alt="Image 1 Preview"
+                class="img-fluid mt-2"
+                style="display: none; max-height: 200px"
+              />
+            </div>
+            <div class="col-md-6">
+              <label for="fieldImage2" class="form-label">Field Image 2</label>
+              <input
+                type="file"
+                class="form-control"
+                id="fieldImage2"
+                accept="image/*"
+              />
+              <img
+                id="previewImage2"
+                src="#"
+                alt="Image 2 Preview"
+                class="img-fluid mt-2"
+                style="display: none; max-height: 200px"
+              />
+            </div>
+          </div>
+          <!-- Buttons -->
+          <div class="d-flex justify-content-between align-items-center">
+            <div class="d-flex gap-2">
+              <button
+                type="submit"
+                class="btn btn-success flex-grow-1"
+                id="saveBtn"
+                style="width: 100px;"
+              >
+                Save
+              </button>
+              <button
+                type="button"
+                class="btn btn-primary flex-grow-1"
+                id="updateBtn"
+                style="width: 100px"
+              >
+                Update
+              </button>
+              <button
+                type="button"
+                class="btn btn-warning flex-grow-1"
+                id="clearBtn"
+                style="width: 100px"
+              >
+                Clear
+              </button>
+              <button
+                type="button"
+                class="btn btn-danger flex-grow-1"
+                id="deleteBtn"
+                style="width: 100px"
+              >
+                Delete
+              </button>
+            </div>
             <button
               type="button"
-              class="btn btn-secondary"
-              data-bs-dismiss="modal"
+              class="btn btn-info"
+              data-bs-toggle="modal"
+              data-bs-target="#fieldListModal"
+              id="getAllBtn"
+              style="width: 100px"
             >
-              Close
+              All Fields
             </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- get all pop up -->
+      <div
+        class="modal fade"
+        id="fieldListModal"
+        tabindex="-1"
+        aria-labelledby="fieldListModalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="fieldListModalLabel">Field Details </h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <div id="fieldList">
+                <table class="table table-bordered">
+                  <thead class="table-success">
+                    <tr>
+                      <th>Field Code</th>
+                      <th>Field Name</th>
+                      <th>Location</th>
+                      <th>Size</th>
+                      <th>Crops</th>
+                      <th>Staff</th>
+                      <th>Image 1</th>
+                      <th>Image 2</th>
+                    </tr>
+                  </thead>
+                  <tbody id="fieldTableBody"></tbody>
+                </table>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+              >
+                Close
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -217,5 +228,6 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="/assets/js/field.js"></script>
+    <script src="/assets/js/sidebarController.js"></script>
   </body>
 </html>
