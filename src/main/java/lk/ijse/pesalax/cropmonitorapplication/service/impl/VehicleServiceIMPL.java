@@ -4,6 +4,7 @@ import lk.ijse.pesalax.cropmonitorapplication.dao.VehicleDAO;
 import lk.ijse.pesalax.cropmonitorapplication.dto.impl.VehicleDTO;
 import lk.ijse.pesalax.cropmonitorapplication.entity.impl.Vehicle;
 import lk.ijse.pesalax.cropmonitorapplication.exception.DataPersistException;
+import lk.ijse.pesalax.cropmonitorapplication.exception.VehicleNotFoundException;
 import lk.ijse.pesalax.cropmonitorapplication.service.VehicleService;
 import lk.ijse.pesalax.cropmonitorapplication.util.Mapping;
 import lombok.RequiredArgsConstructor;
@@ -22,26 +23,55 @@ public class VehicleServiceIMPL implements VehicleService {
 
     @Override
     public void saveVehicle(VehicleDTO vehicleDTO) {
-
+        Vehicle savedVehicle = vehicleDAO.save(mapping.convertToVehicle(vehicleDTO));
+        if (savedVehicle == null) {
+            throw new DataPersistException("Can't save vehicle");
+        }
     }
 
     @Override
     public List<VehicleDTO> getAllVehicles() {
-        return List.of();
+        List<Vehicle> allVehicles = vehicleDAO.findAll();
+        return mapping.convertToVehicleListDTO(allVehicles);
     }
 
     @Override
-    public VehicleDTO getSelectedVehicle(String vehicleCode) {
-        return null;
+    public List<VehicleDTO> searchVehicles(String vehicleCode, String vehicleCategory) {
+        List<Vehicle> vehicles = vehicleDAO.findByVehicleCodeOrVehicleCategory(vehicleCode, vehicleCategory);
+        return mapping.convertToVehicleListDTO(vehicles);
     }
 
     @Override
     public void deleteVehicle(String vehicleCode) {
-
+        if (!vehicleDAO.existsById(vehicleCode)) {
+            throw new VehicleNotFoundException("Vehicle not found with code: " + vehicleCode);
+        }
+        vehicleDAO.deleteById(vehicleCode);
     }
 
     @Override
     public void updateVehicle(String vehicleCode, VehicleDTO vehicleDTO) {
+        Vehicle existingVehicle = vehicleDAO.findById(vehicleCode)
+                .orElseThrow(() -> new VehicleNotFoundException("Vehicle not found with code: " + vehicleCode));
+
+        // Update fields conditionally
+        if (vehicleDTO.getLicensePlateNumber() != null) {
+            existingVehicle.setLicensePlateNumber(vehicleDTO.getLicensePlateNumber());
+        }
+        if (vehicleDTO.getVehicleCategory() != null) {
+            existingVehicle.setVehicleCategory(vehicleDTO.getVehicleCategory());
+        }
+        if (vehicleDTO.getFuelType() != null) {
+            existingVehicle.setFuelType(vehicleDTO.getFuelType());
+        }
+        if (vehicleDTO.getStatus() != null) {
+            existingVehicle.setStatus(vehicleDTO.getStatus());
+        }
+        if (vehicleDTO.getRemarks() != null) {
+            existingVehicle.setRemarks(vehicleDTO.getRemarks());
+        }
+
+        vehicleDAO.save(existingVehicle);
 
     }
 }
