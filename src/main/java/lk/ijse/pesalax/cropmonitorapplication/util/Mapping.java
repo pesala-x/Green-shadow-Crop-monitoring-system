@@ -1,7 +1,9 @@
 package lk.ijse.pesalax.cropmonitorapplication.util;
 
 import lk.ijse.pesalax.cropmonitorapplication.dto.impl.FieldDTO;
+import lk.ijse.pesalax.cropmonitorapplication.dto.impl.VehicleDTO;
 import lk.ijse.pesalax.cropmonitorapplication.entity.impl.Field;
+import lk.ijse.pesalax.cropmonitorapplication.entity.impl.Vehicle;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +16,7 @@ public class Mapping {
     @Autowired
     private ModelMapper modelMapper;
 
+    // Field mappings
     public FieldDTO convertToFieldDTO(Field field) {
         return modelMapper.map(field, FieldDTO.class);
     }
@@ -25,5 +28,18 @@ public class Mapping {
     public List<FieldDTO> convertToFieldListDTO(List<Field> fields) {
         return modelMapper.map(fields, new TypeToken<List<FieldDTO>>() {
         }.getType());
+    }
+
+    // Vehicle mappings
+    public VehicleDTO convertToVehicleDTO(Vehicle vehicle) {
+        return modelMapper.map(vehicle, VehicleDTO.class);
+    }
+
+    public Vehicle convertToVehicle(VehicleDTO vehicleDTO) {
+        return modelMapper.map(vehicleDTO, Vehicle.class);
+    }
+
+    public List<VehicleDTO> convertToVehicleListDTO(List<Vehicle> vehicles) {
+        return modelMapper.map(vehicles, new TypeToken<List<VehicleDTO>>() {}.getType());
     }
 }
