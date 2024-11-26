@@ -38,12 +38,14 @@ public class CropServiceIMPL implements CropService {
 
     @Override
     public List<CropDTO> searchCrops(String cropCode, String cropCommonName) {
-        return null;
+        List<Crop> crops = cropDAO.findByCropCodeOrCropCommonName(cropCode, cropCommonName);
+        return mapping.convertToCropListDTO(crops);
     }
 
     @Override
     public List<CropDTO> getAllCrops() {
-        return null;
+        List<Crop> getAllcrops = cropDAO.findAll();
+        return mapping.convertToCropListDTO(getAllcrops);
     }
 
     @Override
