@@ -74,10 +74,8 @@ public class CropController {
     }
 
     @GetMapping()
-    public ResponseEntity<List<CropDTO>> searchCrops(
-            @RequestParam(value = "cropCode", required = false) String cropCode,
-            @RequestParam(value = "cropCommonName", required = false) String cropCommonName) {
-        List<CropDTO> crops = cropService.searchCrops(cropCode, cropCommonName);
+    public ResponseEntity<List<CropDTO>> searchCrops(@RequestParam("searchTerm") String searchTerm) {
+        List<CropDTO> crops = cropService.searchCrops(searchTerm);
         return new ResponseEntity<>(crops, HttpStatus.OK);
     }
 
