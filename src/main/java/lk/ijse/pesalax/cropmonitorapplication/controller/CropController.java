@@ -93,4 +93,36 @@ public class CropController {
         }
     }
 
+    @PatchMapping(value = "/{cropCode}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Void> updateSelectedCrop(
+            @PathVariable("cropCode") String cropCode,
+            @RequestParam(value = "cropCommonName", required = false) String cropCommonName,
+            @RequestParam(value = "cropScientificName", required = false) String cropScientificName,
+            @RequestParam(value = "category", required = false) String category,
+            @RequestParam(value = "cropSeason", required = false) String cropSeason,
+            @RequestParam(value = "cropImage", required = false) MultipartFile cropImage,
+            @RequestParam(value = "fieldCode", required = false) String fieldCode
+    ) {
+        try {
+            CropDTO cropDTO = new CropDTO();
+
+            if (cropCommonName != null) cropDTO.setCropCommonName(cropCommonName);
+            if (cropScientificName != null) cropDTO.setCropScientificName(cropScientificName);
+            if (category != null) cropDTO.setCategory(category);
+            if (cropSeason != null) cropDTO.setCropSeason(cropSeason);
+
+            if (cropImage != null && !cropImage.isEmpty()) {
+                cropDTO.setCropImage(AppUtil.toBase64(cropImage.getBytes()));
+            }
+
+            if (fieldCode != null) cropDTO.setFieldCode(fieldCode);
+
+            cropService.updateCrop(cropCode, cropDTO);
+
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

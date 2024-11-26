@@ -63,6 +63,24 @@ public class CropServiceIMPL implements CropService {
 
     @Override
     public void updateCrop(String cropCode, CropDTO cropDTO) {
+        Crop existingCrop = cropDAO.findById(cropCode)
+                .orElseThrow(() -> new CropNotFoundException(cropCode));
 
+        if (cropDTO.getCropCommonName() != null) {
+            existingCrop.setCropCommonName(cropDTO.getCropCommonName());
+        }
+        if (cropDTO.getCropScientificName() != null) {
+            existingCrop.setCropScientificName(cropDTO.getCropScientificName());
+        }
+        if (cropDTO.getCategory() != null) {
+            existingCrop.setCategory(cropDTO.getCategory());
+        }
+        if (cropDTO.getCropSeason() != null) {
+            existingCrop.setCropSeason(cropDTO.getCropSeason());
+        }
+        if (cropDTO.getCropImage() != null) {
+            existingCrop.setCropImage(cropDTO.getCropImage());
+        }
+        cropDAO.save(existingCrop);
     }
 }
