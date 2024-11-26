@@ -1,7 +1,9 @@
 package lk.ijse.pesalax.cropmonitorapplication.util;
 
+import lk.ijse.pesalax.cropmonitorapplication.dto.impl.CropDTO;
 import lk.ijse.pesalax.cropmonitorapplication.dto.impl.FieldDTO;
 import lk.ijse.pesalax.cropmonitorapplication.dto.impl.VehicleDTO;
+import lk.ijse.pesalax.cropmonitorapplication.entity.impl.Crop;
 import lk.ijse.pesalax.cropmonitorapplication.entity.impl.Field;
 import lk.ijse.pesalax.cropmonitorapplication.entity.impl.Vehicle;
 import org.modelmapper.ModelMapper;
@@ -41,5 +43,16 @@ public class Mapping {
 
     public List<VehicleDTO> convertToVehicleListDTO(List<Vehicle> vehicles) {
         return modelMapper.map(vehicles, new TypeToken<List<VehicleDTO>>() {}.getType());
+    }
+
+    //Crop mappings
+    public CropDTO convertToCropDTO(Crop crop) {
+        return modelMapper.map(crop, CropDTO.class);
+    }
+    public Crop convertToCrop(CropDTO cropDTO) {
+        return modelMapper.map(cropDTO, Crop.class);
+    }
+    public List<CropDTO> convertToCropListDTO(List<Crop> crops) {
+        return modelMapper.map(crops, new TypeToken<List<CropDTO>>() {}.getType());
     }
 }
