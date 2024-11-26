@@ -5,6 +5,7 @@ import lk.ijse.pesalax.cropmonitorapplication.dao.FieldDAO;
 import lk.ijse.pesalax.cropmonitorapplication.dto.impl.CropDTO;
 import lk.ijse.pesalax.cropmonitorapplication.entity.impl.Crop;
 import lk.ijse.pesalax.cropmonitorapplication.entity.impl.Field;
+import lk.ijse.pesalax.cropmonitorapplication.exception.CropNotFoundException;
 import lk.ijse.pesalax.cropmonitorapplication.exception.DataPersistException;
 import lk.ijse.pesalax.cropmonitorapplication.service.CropService;
 import lk.ijse.pesalax.cropmonitorapplication.util.Mapping;
@@ -13,6 +14,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
+
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -50,7 +53,12 @@ public class CropServiceIMPL implements CropService {
 
     @Override
     public void deleteCrop(String cropCode) {
-
+        Optional<Crop> selectedCrop = cropDAO.findById(cropCode);
+        if(!selectedCrop.isPresent()){
+            throw new CropNotFoundException(cropCode);
+        } else {
+            cropDAO.deleteById(cropCode);
+        }
     }
 
     @Override

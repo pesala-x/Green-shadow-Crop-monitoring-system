@@ -3,6 +3,7 @@ package lk.ijse.pesalax.cropmonitorapplication.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import lk.ijse.pesalax.cropmonitorapplication.customObj.FieldErrorResponse;
 import lk.ijse.pesalax.cropmonitorapplication.dto.impl.CropDTO;
+import lk.ijse.pesalax.cropmonitorapplication.exception.CropNotFoundException;
 import lk.ijse.pesalax.cropmonitorapplication.exception.DataPersistException;
 import lk.ijse.pesalax.cropmonitorapplication.service.CropService;
 import lk.ijse.pesalax.cropmonitorapplication.util.AppUtil;
@@ -78,6 +79,18 @@ public class CropController {
             @RequestParam(value = "cropCommonName", required = false) String cropCommonName) {
         List<CropDTO> crops = cropService.searchCrops(cropCode, cropCommonName);
         return new ResponseEntity<>(crops, HttpStatus.OK);
+    }
+
+    @DeleteMapping(value = "/{code}")
+    public ResponseEntity<Void> deleteSelectedCrop(@PathVariable("code") String code) {
+        try {
+            cropService.deleteCrop(code);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (CropNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
 }
