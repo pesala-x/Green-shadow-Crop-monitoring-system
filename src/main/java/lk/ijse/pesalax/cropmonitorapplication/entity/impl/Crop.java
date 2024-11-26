@@ -18,6 +18,7 @@ public class Crop implements SuperEntity {
     private String cropScientificName;
     private String category;
     private String cropSeason;
+    @Column(columnDefinition = "LONGTEXT")
     private String cropImage;
     @ManyToOne
     @JoinColumn(name = "fieldCode", nullable = false)
