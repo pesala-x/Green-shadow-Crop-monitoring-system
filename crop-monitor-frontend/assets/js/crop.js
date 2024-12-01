@@ -173,4 +173,23 @@ $(document).ready(function () {
     });
   });
 
+  // Delete Crop
+  $("#deleteBtn").on("click", function () {
+    const cropCode = $("#cropCode").val();
+    if (confirm("Are you sure you want to delete this crop?")) {
+      $.ajax({
+        url: `http://localhost:5050/crop-monitor/api/v1/crops/${cropCode}`,
+        type: "DELETE",
+        success: function () {
+          alert("Crop deleted successfully!");
+          $("#cropForm")[0].reset();
+          generateCropCode();
+        },
+        error: function () {
+          alert("Error deleting crop.");
+        },
+      });
+    }
+  });
+
 });
