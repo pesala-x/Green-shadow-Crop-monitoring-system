@@ -144,4 +144,33 @@ $(document).ready(function () {
     });
   }
 
+  // Update Crop
+  $("#updateBtn").on("click", function () {
+    let formData = new FormData();
+    formData.append("cropCommonName", $("#cropCommonName").val());
+    formData.append("cropScientificName", $("#cropScientificName").val());
+    formData.append("category", $("#cropCategory").val());
+    formData.append("cropSeason", $("#cropSeason").val());
+    formData.append("fieldCode", $("#field").val());
+    if ($("#cropImage")[0].files[0]) {
+      formData.append("cropImage", $("#cropImage")[0].files[0]);
+    }
+
+    $.ajax({
+      url: `http://localhost:5050/crop-monitor/api/v1/crops/${$(
+        "#cropCode"
+      ).val()}`,
+      type: "PATCH",
+      data: formData,
+      contentType: false,
+      processData: false,
+      success: function () {
+        alert("Crop updated successfully!");
+      },
+      error: function () {
+        alert("Error updating crop.");
+      },
+    });
+  });
+
 });
