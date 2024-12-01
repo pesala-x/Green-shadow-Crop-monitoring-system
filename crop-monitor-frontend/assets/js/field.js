@@ -179,45 +179,55 @@ $(document).ready(function () {
   });
 
   function performSearch() {
-    const fieldCode = $("#searchField").val().trim();
-    if (!fieldCode) {
-      alert("Please enter a field code to search.");
+    const searchTerm = $("#searchField").val().trim();
+    if (!searchTerm) {
+      alert("Please enter a field code or name to search.");
       return;
     }
 
     $.ajax({
-      url: `http://localhost:5050/crop-monitor/api/v1/fields/${fieldCode}`,
+      url: `http://localhost:5050/crop-monitor/api/v1/fields?searchTerm=${encodeURIComponent(
+        searchTerm
+      )}`,
       type: "GET",
       contentType: "application/json",
       success: function (data) {
-        $("#fieldCode").val(data.fieldCode);
-        $("#fieldName").val(data.fieldName);
-        $("#fieldLocation").val(data.fieldLocation);
-        $("#fieldSize").val(data.extentSize);
-        $("#crops").val(data.crops).trigger("change");
-        $("#staff").val(data.staff);
+        if (data.length > 0) {
+          const field = data[0]; // Use the first matched field
+          $("#fieldCode").val(field.fieldCode);
+          $("#fieldName").val(field.fieldName);
+          $("#fieldLocation").val(field.fieldLocation);
+          $("#fieldSize").val(field.extentSize);
+          $("#crops").val(field.crops).trigger("change");
+          $("#staff").val(field.staff);
 
-        if (data.fieldImage1) {
-          $("#previewImage1")
-            .attr("src", `data:image/png;base64,${data.fieldImage1}`)
-            .show();
-        } else {
-          $("#previewImage1").hide();
-        }
+          if (field.fieldImage1) {
+            $("#previewImage1")
+              .attr("src", `data:image/png;base64,${field.fieldImage1}`)
+              .show();
+          } else {
+            $("#previewImage1").hide();
+          }
 
-        if (data.fieldImage2) {
-          $("#previewImage2")
-            .attr("src", `data:image/png;base64,${data.fieldImage2}`)
-            .show();
+          if (field.fieldImage2) {
+            $("#previewImage2")
+              .attr("src", `data:image/png;base64,${field.fieldImage2}`)
+              .show();
+          } else {
+            $("#previewImage2").hide();
+          }
         } else {
-          $("#previewImage2").hide();
+          alert(
+            "Field not found. Please check the field code or name and try again."
+          );
         }
       },
       error: function () {
-        alert("Field not found. Please check the field code and try again.");
+        alert("An error occurred. Please try again.");
       },
     });
   }
+
 });
 
         /*
