@@ -192,4 +192,12 @@ $(document).ready(function () {
     }
   });
 
+  // Clear Crop Form
+  $("#clearBtn").on("click", function () {
+    $("#cropForm")[0].reset();
+    generateCropCode();
+    $("#previewCropImage").hide(); // hide preview if any
+  });
+
 });
+
