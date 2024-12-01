@@ -92,6 +92,56 @@ $(document).ready(function () {
     });
   });
 
-  
+  // search crop
+  $("#searchIcon").on("click", function () {
+    searchAndFillCropForm();
+  });
+
+  $("#searchCrop").on("keypress", function (e) {
+    if (e.which == 13) {
+      searchAndFillCropForm();
+    }
+  });
+
+  function searchAndFillCropForm() {
+    const searchTerm = $("#searchCrop").val().trim();
+    if (searchTerm === "") {
+      alert("Please enter a crop code or common name.");
+      return;
+    }
+
+    $.ajax({
+      url: `http://localhost:5050/crop-monitor/api/v1/crops?searchTerm=${encodeURIComponent(
+        searchTerm
+      )}`,
+      type: "GET",
+      contentType: "application/json",
+      success: function (data) {
+        if (data.length === 0) {
+          alert("No matching crop found.");
+          return;
+        }
+
+        const crop = data[0];
+        $("#cropCode").val(crop.cropCode);
+        $("#cropCommonName").val(crop.cropCommonName);
+        $("#cropScientificName").val(crop.cropScientificName);
+        $("#cropCategory").val(crop.category).change();
+        $("#cropSeason").val(crop.cropSeason).change();
+        $("#field").val(crop.fieldCode).change();
+
+        if (crop.cropImage) {
+          $("#previewCropImage")
+            .attr("src", `data:image/png;base64,${crop.cropImage}`)
+            .show();
+        } else {
+          $("#previewCropImage").hide();
+        }
+      },
+      error: function (xhr, status, error) {
+        alert("Error retrieving crop data: " + xhr.responseJSON.message);
+      },
+    });
+  }
 
 });
