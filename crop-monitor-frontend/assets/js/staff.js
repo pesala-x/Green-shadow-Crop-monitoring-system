@@ -24,7 +24,7 @@ $(document).ready(function () {
 // Load vehicles to staff form dropdown
 function loadVehicles() {
   $.ajax({
-    url: "http://localhost:5050/cropmonitoring/api/v1/vehicles/allVehicles",
+    url: "http://localhost:5050/crop-monitor/api/v1/vehicles/allVehicles",
     method: "GET",
     success: function (vehicles) {
       $("#vehicleList")
