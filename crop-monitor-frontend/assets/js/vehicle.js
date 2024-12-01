@@ -6,7 +6,7 @@ $(document).ready(function () {
   }
   generateVehicleCode();
 
-//save Vehicle----------------------------------------------------------------------
+  // save vehicle
   $("#vehicleForm").on("submit", function (e) {
     e.preventDefault();
 
@@ -36,46 +36,52 @@ $(document).ready(function () {
     });
   });
 
-  // search vehicle-------------------------------------------------------------
-  function searchVehicle() {
-    const vehicleCode = $("#searchField").val();
-    if (!vehicleCode) return alert("Please enter Vehicle Code to search.");
+  // search vehicle
+  $("#searchIcon").on("click", function () {
+    searchAndFillVehicleForm();
+  });
+
+  $("#searchField").on("keypress", function (e) {
+    if (e.which == 13) {
+      searchAndFillVehicleForm();
+    }
+  });
+
+  function searchAndFillVehicleForm() {
+    const searchTerm = $("#searchField").val().trim();
+    if (searchTerm === "") {
+      alert("Please enter a Vehicle Code or License Plate Number.");
+      return;
+    }
 
     $.ajax({
-      url: `http://localhost:5050/crop-monitor/api/v1/vehicles`,
+      url: `http://localhost:5050/crop-monitor/api/v1/vehicles?searchTerm=${encodeURIComponent(
+        searchTerm
+      )}`,
       type: "GET",
-      data: { vehicleCode },
-      success: function (vehicles) {
-        if (vehicles.length > 0) {
-          const vehicle = vehicles[0];
-          $("#vehicleCode").val(vehicle.vehicleCode);
-          $("#licensePlate").val(vehicle.licensePlateNumber);
-          $("#vehicleCategory").val(vehicle.vehicleCategory);
-          $("#fuelType").val(vehicle.fuelType);
-          $("#status").val(vehicle.status);
-          $("#allocatedStaff").val(vehicle.allocatedStaff);
-          $("#remarks").val(vehicle.remarks);
-        } else {
-          alert("No vehicle found with that code.");
+      contentType: "application/json",
+      success: function (data) {
+        if (data.length === 0) {
+          alert("No matching vehicle found.");
+          return;
         }
+
+        const vehicle = data[0];
+        $("#vehicleCode").val(vehicle.vehicleCode);
+        $("#licensePlate").val(vehicle.licensePlateNumber);
+        $("#vehicleCategory").val(vehicle.vehicleCategory).change();
+        $("#fuelType").val(vehicle.fuelType).change();
+        $("#status").val(vehicle.status).change();
+        $("#allocatedStaff").val(vehicle.allocatedStaff).change();
+        $("#remarks").val(vehicle.remarks);
       },
       error: function (xhr) {
-        alert("Failed to search vehicle: " + xhr.responseText);
+        alert("Error retrieving vehicle data: " + xhr.responseText);
       },
     });
   }
 
-  $("#searchIcon").click(searchVehicle);
-
-  $("#searchField").on("keydown", function (e) {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      searchVehicle();
-    }
-  });
-
-  // Update vehicle----------------------------------------------
-
+  // Update vehicle
   $("#updateBtn").click(function () {
     const vehicleCode = $("#vehicleCode").val();
     if (!vehicleCode) return alert("Please enter Vehicle Code to update.");
@@ -104,8 +110,7 @@ $(document).ready(function () {
     });
   });
 
-  // Delete vehicle------------------------------------------
-
+  // Delete vehicle
   $("#deleteBtn").click(function () {
     const vehicleCode = $("#vehicleCode").val();
     if (!vehicleCode) return alert("Please enter Vehicle Code to delete.");
@@ -123,8 +128,7 @@ $(document).ready(function () {
     });
   });
 
-  // Get all vehicles---------------------------------------------------------
-
+  // Get all vehicles
   $("#getAllBtn").click(function () {
     $.ajax({
       url: "http://localhost:5050/crop-monitor/api/v1/vehicles/allVehicles",
@@ -152,8 +156,7 @@ $(document).ready(function () {
     });
   });
 
-  // Clear form---------------------------------------------
-
+  // Clear form
   $(document).ready(function () {
     generateVehicleCode();
 
