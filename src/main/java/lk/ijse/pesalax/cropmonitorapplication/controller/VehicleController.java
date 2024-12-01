@@ -51,18 +51,13 @@ public class VehicleController {
     }
 
     @GetMapping()
-    public ResponseEntity<List<VehicleDTO>> searchVehicles(
-            @RequestParam(value = "vehicleCode", required = false) String vehicleCode,
-            @RequestParam(value = "vehicleCategory", required = false) String vehicleCategory) {
-        List<VehicleDTO> crops = vehicleService.searchVehicles(vehicleCode, vehicleCategory);
-        return new ResponseEntity<>(crops, HttpStatus.OK);
+    public ResponseEntity<List<VehicleDTO>> searchVehicles(@RequestParam(value = "searchTerm", required = false) String searchTerm) {
+        List<VehicleDTO> vehicles = vehicleService.searchVehicles(searchTerm);
+        return new ResponseEntity<>(vehicles, HttpStatus.OK);
     }
 
     @PatchMapping(value = "/{vehicleCode}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> updateSelectedVehicle(
-            @PathVariable("vehicleCode") String vehicleCode,
-            @RequestBody VehicleDTO vehicleDTO
-    ) {
+    public ResponseEntity<Void> updateSelectedVehicle(@PathVariable("vehicleCode") String vehicleCode, @RequestBody VehicleDTO vehicleDTO) {
         try {
             vehicleService.updateVehicle(vehicleCode, vehicleDTO);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
