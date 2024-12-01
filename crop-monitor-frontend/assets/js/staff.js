@@ -20,3 +20,32 @@ $(document).ready(function () {
     $("#staffForm")[0].reset();
   });
 });
+
+// Load vehicles to staff form dropdown
+function loadVehicles() {
+  $.ajax({
+    url: "http://localhost:5050/cropmonitoring/api/v1/vehicles/allVehicles",
+    method: "GET",
+    success: function (vehicles) {
+      $("#vehicleList")
+        .empty()
+        .append("<option disabled selected>Select Vehicle</option>");
+
+      vehicles.forEach((vehicle) => {
+        $("#vehicleList").append(
+          new Option(
+            `${vehicle.vehicleCode} - ${vehicle.vehicleCategory}`,
+            vehicle.vehicleCode
+          )
+        );
+      });
+    },
+    error: function (xhr) {
+      console.error("Failed to load vehicles:", xhr.responseText);
+    },
+  });
+}
+
+$(document).ready(function () {
+  loadVehicles();
+});
