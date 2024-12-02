@@ -186,5 +186,56 @@ $(document).ready(function () {
     generateStaffID();
   });
 
-  
+
+  $("#getAllBtn").click(function () {
+    console.log("Fetching all staff...");
+    $.ajax({
+      url: "http://localhost:5050/crop-monitor/api/v1/staff/allstaff",
+      type: "GET",
+      success: function (staffList) {
+        console.log("Staff data received:", staffList);
+
+        let staffRows1 = "";
+        let staffRows2 = "";
+
+        staffList.forEach((staff) => {
+          staffRows1 += `
+            <tr>
+              <td>${staff.id}</td>
+              <td>${staff.firstName}</td>
+              <td>${staff.lastName}</td>
+              <td>${staff.designation}</td>
+              <td>${staff.gender}</td>
+              <td>${new Date(staff.joinedDate).toLocaleDateString()}</td>
+              <td>${new Date(staff.dob).toLocaleDateString()}</td>
+              <td>${staff.role}</td>
+            </tr>
+          `;
+
+          staffRows2 += `
+            <tr>
+              <td>${staff.addressLine01 || "N/A"}</td>
+              <td>${staff.addressLine02 || "N/A"}</td>
+              <td>${staff.addressLine03 || "N/A"}</td>
+              <td>${staff.addressLine04 || "N/A"}</td>
+              <td>${staff.addressLine05 || "N/A"}</td>
+              <td>${staff.contactNo}</td>
+              <td>${staff.email}</td>
+              <td>${staff.vehicle ? staff.vehicle.vehicleCode : "N/A"}</td>
+            </tr>
+          `;
+        });
+
+        $("#staffTableBody1").html(staffRows1);
+        $("#staffTableBody2").html(staffRows2);
+
+        $("#staffListModal").modal("show");
+      },
+      error: function (xhr) {
+        console.error("Failed to fetch staff data:", xhr.responseText);
+        alert("Failed to fetch staff data.");
+      },
+    });
+  });
+
 });
