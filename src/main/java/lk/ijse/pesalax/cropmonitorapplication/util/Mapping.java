@@ -1,13 +1,7 @@
 package lk.ijse.pesalax.cropmonitorapplication.util;
 
-import lk.ijse.pesalax.cropmonitorapplication.dto.impl.CropDTO;
-import lk.ijse.pesalax.cropmonitorapplication.dto.impl.FieldDTO;
-import lk.ijse.pesalax.cropmonitorapplication.dto.impl.StaffDTO;
-import lk.ijse.pesalax.cropmonitorapplication.dto.impl.VehicleDTO;
-import lk.ijse.pesalax.cropmonitorapplication.entity.impl.Crop;
-import lk.ijse.pesalax.cropmonitorapplication.entity.impl.Field;
-import lk.ijse.pesalax.cropmonitorapplication.entity.impl.Staff;
-import lk.ijse.pesalax.cropmonitorapplication.entity.impl.Vehicle;
+import lk.ijse.pesalax.cropmonitorapplication.dto.impl.*;
+import lk.ijse.pesalax.cropmonitorapplication.entity.impl.*;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,5 +63,18 @@ public class Mapping {
 
     public List<StaffDTO> convertToStaffListDTO(List<Staff> staff) {
         return modelMapper.map(staff, new TypeToken<List<StaffDTO>>() {}.getType());
+    }
+
+    //Equipment mapping
+    public EquipmentDTO convertToEquipmentDTO(Equipment equipment) {
+        return modelMapper.map(equipment, EquipmentDTO.class);
+    }
+
+    public Equipment convertToEquipment(EquipmentDTO equipmentDTO) {
+        return modelMapper.map(equipmentDTO, Equipment.class);
+    }
+
+    public List<EquipmentDTO> convertToEquipmentListDTO(List<Equipment> equipments) {
+        return modelMapper.map(equipments, new TypeToken<List<EquipmentDTO>>() {}.getType());
     }
 }
