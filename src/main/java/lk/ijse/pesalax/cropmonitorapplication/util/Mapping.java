@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class Mapping {
@@ -75,6 +76,11 @@ public class Mapping {
     }
 
     public List<EquipmentDTO> convertToEquipmentListDTO(List<Equipment> equipments) {
-        return modelMapper.map(equipments, new TypeToken<List<EquipmentDTO>>() {}.getType());
+        return equipments.stream().map(equipment -> {
+            EquipmentDTO equipmentDTO = modelMapper.map(equipment, EquipmentDTO.class);
+            equipmentDTO.setFieldCode(equipment.getField().getFieldCode());
+            equipmentDTO.setId(equipment.getStaff().getId());
+            return equipmentDTO;
+        }).collect(Collectors.toList());
     }
 }

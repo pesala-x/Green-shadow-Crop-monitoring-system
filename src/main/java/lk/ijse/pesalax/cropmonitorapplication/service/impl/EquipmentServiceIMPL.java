@@ -47,7 +47,8 @@ public class EquipmentServiceIMPL implements EquipmentService {
 
     @Override
     public List<EquipmentDTO> getAllEquipment() {
-        return List.of();
+        List<Equipment> getAllEquipment = equipmentDAO.findAll();
+        return mapping.convertToEquipmentListDTO(getAllEquipment);
     }
 
     @Override
