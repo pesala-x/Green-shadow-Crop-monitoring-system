@@ -1,13 +1,31 @@
 $(document).ready(function () {
   generateEquipmentID();
-  loadStaffDropdown();
   loadFieldDropdown();
+  loadStaffDropdown();
 
   // Generate Equipment ID
   function generateEquipmentID() {
     const id = "E-" + Math.floor(1000 + Math.random() * 9000);
     $("#equipmentId").val(id);
   }
+
+// Load Staff Dropdown
+function loadStaffDropdown() {
+  $.ajax({
+    url: "http://localhost:5050/crop-monitor/api/v1/staff/allstaff",
+    method: "GET",
+    success: function (staffList) {
+      staffList.forEach((staff) => {
+        $("#assignedStaff").append(
+          `<option value="${staff.id}">${staff.id} - ${staff.firstName} ${staff.lastName}</option>`
+        );
+      });
+    },
+    error: function () {
+      alert("Failed to load staff data.");
+    },
+  });
+}
 
   // Load Field Dropdown
   function loadFieldDropdown() {
