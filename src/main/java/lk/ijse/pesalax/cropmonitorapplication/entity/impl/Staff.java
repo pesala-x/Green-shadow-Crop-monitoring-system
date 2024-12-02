@@ -12,7 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
-@ToString(exclude = {"vehicle", "assignments"})
+@ToString(exclude = {"vehicle", "assignments", "equipmentList"})
 @Entity
 @Table(name = "staffs")
 public class Staff implements SuperEntity {
@@ -33,4 +33,6 @@ public class Staff implements SuperEntity {
     private Vehicle vehicle;
     @OneToMany(mappedBy = "staff", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<FieldStaffAssignment> assignments = new ArrayList<>();
+    @OneToMany(mappedBy = "staff")
+    private List<Equipment> equipmentList = new ArrayList<>();
 }

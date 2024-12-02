@@ -11,7 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
-@ToString(exclude = {"crops", "assignments"})
+@ToString(exclude = {"crops", "assignments", "equipmentList"})
 @Entity
 @Table(name = "fields")
 public class Field implements SuperEntity {
