@@ -42,11 +42,12 @@
             class="fas fa-search position-absolute"
             id="searchIcon"
             style="
-              right: 10px;
-              top: 50%;
-              transform: translateY(-50%);
-              cursor: pointer;
-              line-height: 1;
+            right: 10px;
+            top: 38%;
+            transform: translateY(-50%);
+            color: black;
+            cursor: pointer;
+            line-height: 1;
             "
           ></i>
         </div>
@@ -68,6 +69,7 @@
                 type="text"
                 class="form-control"
                 id="licensePlate"
+                placeholder="LO-6655"
                 required
               />
             </div>
@@ -144,7 +146,7 @@
               </button>
               <button
                 type="button"
-                class="btn btn-primary flex-grow-1"
+                class="btn btn-success flex-grow-1"
                 id="updateBtn"
                 style="width: 100px"
               >
@@ -152,7 +154,7 @@
               </button>
               <button
                 type="button"
-                class="btn btn-warning flex-grow-1"
+                class="btn btn-success flex-grow-1"
                 id="clearBtn"
                 style="width: 100px"
               >
@@ -160,7 +162,7 @@
               </button>
               <button
                 type="button"
-                class="btn btn-danger flex-grow-1"
+                class="btn btn-read flex-grow-1"
                 id="deleteBtn"
                 style="width: 100px"
               >
@@ -169,7 +171,7 @@
             </div>
             <button
               type="button"
-              class="btn btn-info"
+              class="btn btn-success"
               data-bs-toggle="modal"
               data-bs-target="#vehicleListModal"
               id="getAllBtn"
