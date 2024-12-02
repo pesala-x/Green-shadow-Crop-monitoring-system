@@ -41,14 +41,14 @@ $(document).ready(function () {
     searchAndFillVehicleForm();
   });
 
-  $("#searchField").on("keypress", function (e) {
+  $("#searchVehicle").on("keypress", function (e) {
     if (e.which == 13) {
       searchAndFillVehicleForm();
     }
   });
 
   function searchAndFillVehicleForm() {
-    const searchTerm = $("#searchField").val().trim();
+    const searchTerm = $("#searchVehicle").val().trim();
     if (searchTerm === "") {
       alert("Please enter a Vehicle Code or License Plate Number.");
       return;
