@@ -1,7 +1,9 @@
 package lk.ijse.pesalax.cropmonitorapplication.controller;
 
 import lk.ijse.pesalax.cropmonitorapplication.dto.impl.EquipmentDTO;
+import lk.ijse.pesalax.cropmonitorapplication.exception.CropNotFoundException;
 import lk.ijse.pesalax.cropmonitorapplication.exception.DataPersistException;
+import lk.ijse.pesalax.cropmonitorapplication.exception.EquipmentNotFoundException;
 import lk.ijse.pesalax.cropmonitorapplication.service.EquipmentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -37,5 +39,37 @@ public class EquipmentController {
     @GetMapping(value = "allEquipment", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<EquipmentDTO> getAllEquipment() {
         return equipmentService.getAllEquipment();
+    }
+
+    @GetMapping()
+    public ResponseEntity<List<EquipmentDTO>> searchEquipments(@RequestParam(value = "searchTerm", required = false) String searchTerm) {
+        List<EquipmentDTO> equipments = equipmentService.searchEquipment(searchTerm);
+        return new ResponseEntity<>(equipments, HttpStatus.OK);
+    }
+
+    @DeleteMapping(value = "/{id}")
+    public ResponseEntity<Void> deleteSelectedCrop(@PathVariable("id") String id) {
+        try {
+            equipmentService.deleteEquipment(id);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (CropNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PatchMapping(value = "/{equipmentId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> updateSelectedEquipment(@PathVariable("equipmentId") String equipmentId,
+                                                        @RequestBody EquipmentDTO equipmentDTO) {
+        try {
+            equipmentService.updateEquipment(equipmentId, equipmentDTO);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (EquipmentNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }
