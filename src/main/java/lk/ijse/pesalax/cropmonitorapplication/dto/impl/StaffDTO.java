@@ -1,5 +1,6 @@
 package lk.ijse.pesalax.cropmonitorapplication.dto.impl;
 
+import lk.ijse.pesalax.cropmonitorapplication.customObj.StaffResponse;
 import lk.ijse.pesalax.cropmonitorapplication.dto.StaffStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,7 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class StaffDTO implements StaffStatus {
+public class StaffDTO implements StaffStatus, StaffResponse {
     private String id;
     private String firstName;
     private String lastName;
