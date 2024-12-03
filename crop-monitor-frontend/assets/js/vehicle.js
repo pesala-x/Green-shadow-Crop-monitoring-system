@@ -16,7 +16,6 @@ $(document).ready(function () {
     formData.append("vehicleCategory", $("#vehicleCategory").val());
     formData.append("fuelType", $("#fuelType").val());
     formData.append("status", $("#status").val());
-    formData.append("allocatedStaff", $("#allocatedStaff").val());
     formData.append("remarks", $("#remarks").val());
 
     $.ajax({
@@ -72,7 +71,6 @@ $(document).ready(function () {
         $("#vehicleCategory").val(vehicle.vehicleCategory).change();
         $("#fuelType").val(vehicle.fuelType).change();
         $("#status").val(vehicle.status).change();
-        $("#allocatedStaff").val(vehicle.allocatedStaff).change();
         $("#remarks").val(vehicle.remarks);
       },
       error: function (xhr) {
@@ -91,7 +89,6 @@ $(document).ready(function () {
       vehicleCategory: $("#vehicleCategory").val(),
       fuelType: $("#fuelType").val(),
       status: $("#status").val(),
-      allocatedStaff: $("#allocatedStaff").val(),
       remarks: $("#remarks").val(),
     };
 
@@ -143,7 +140,6 @@ $(document).ready(function () {
               <td>${vehicle.vehicleCategory}</td>
               <td>${vehicle.fuelType}</td>
               <td>${vehicle.status}</td>
-              <td>${vehicle.allocatedStaff}</td>
               <td>${vehicle.remarks}</td>
             </tr>
           `;

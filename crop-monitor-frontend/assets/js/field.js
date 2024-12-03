@@ -6,27 +6,6 @@ $(document).ready(function () {
     closeOnSelect: false,
     width: "100%",
   });
-
-  // Clear search input & refresh dropdown after each item is selected
-  $("#crops").on("select2:select", function (e) {
-    let $searchField =
-    $(this).data("select2").dropdown.$search ||
-    $(this).data("select2").selection.$search;
-    $searchField.val("");
-    $searchField.trigger("focus");
-    $(this).select2("close");
-    $(this).select2("open");
-  });
-
-  // Close dropdown when clicking outside
-  $(document).on("click", function (e) {
-    if (
-      !$(e.target).closest("#crops").length &&
-      !$(e.target).closest(".select2-container").length
-    ) {
-      $("#crops").select2("close");
-    }
-  });
 });
 
 // field code genarate
@@ -80,14 +59,8 @@ $("#getAllBtn").on("click", function () {
                       <td>${field.fieldName}</td>
                       <td>${field.fieldLocation}</td>
                       <td>${field.extentSize}</td>
-                      <td>${field.crops.join(", ")}</td>
-                      <td>${field.staff}</td>
-                      <td><img src="data:image/png;base64,${
-                        field.fieldImage1
-                      }" alt="Image 1" style="max-height: 50px;"></td>
-                      <td><img src="data:image/png;base64,${
-                        field.fieldImage2
-                      }" alt="Image 2" style="max-height: 50px;"></td>
+                      <td><img src="data:image/png;base64,${field.fieldImage1}" alt="Image 1" style="max-height: 50px;"></td>
+                      <td><img src="data:image/png;base64,${field.fieldImage2}" alt="Image 2" style="max-height: 50px;"></td>
                   </tr>
               `);
       });
@@ -198,8 +171,6 @@ $(document).ready(function () {
           $("#fieldName").val(field.fieldName);
           $("#fieldLocation").val(field.fieldLocation);
           $("#fieldSize").val(field.extentSize);
-          $("#crops").val(field.crops).trigger("change");
-          $("#staff").val(field.staff);
 
           if (field.fieldImage1) {
             $("#previewImage1")
