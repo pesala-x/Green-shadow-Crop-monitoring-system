@@ -61,13 +61,13 @@ h3 {
   border-radius: 10px;
   font-size: 1rem;
   font-weight: 600;
-  background: linear-gradient(135deg, #6a11cb, #2575fc);
+  background: linear-gradient(135deg, #10ba3d, #45fc25);
   border: none;
   color: #fff;
   transition: all 0.3s ease;
 }
 .btn:hover {
-  background: linear-gradient(135deg, #2575fc, #6a11cb);
+  background: linear-gradient(135deg, #45fc25, #11cb43);
   transform: scale(1.05);
 }
 a {
