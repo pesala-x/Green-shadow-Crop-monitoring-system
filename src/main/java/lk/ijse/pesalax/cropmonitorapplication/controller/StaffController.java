@@ -3,6 +3,7 @@ package lk.ijse.pesalax.cropmonitorapplication.controller;
 import lk.ijse.pesalax.cropmonitorapplication.dto.impl.StaffDTO;
 import lk.ijse.pesalax.cropmonitorapplication.exception.CropNotFoundException;
 import lk.ijse.pesalax.cropmonitorapplication.exception.DataPersistException;
+import lk.ijse.pesalax.cropmonitorapplication.exception.StaffMemberNotFoundException;
 import lk.ijse.pesalax.cropmonitorapplication.exception.VehicleNotFoundException;
 import lk.ijse.pesalax.cropmonitorapplication.service.StaffService;
 import lombok.RequiredArgsConstructor;
@@ -21,15 +22,15 @@ public class StaffController {
     private final StaffService staffService;
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> saveStaffMember(@RequestBody StaffDTO staff) {
-        if (staff == null){
+        if (staff == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }else {
+        } else {
             try {
                 staffService.saveStaff(staff);
                 return new ResponseEntity<>(HttpStatus.CREATED);
-            }catch (DataPersistException e){
+            } catch (DataPersistException e) {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            }catch (Exception e){
+            } catch (Exception e) {
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
@@ -59,14 +60,24 @@ public class StaffController {
     }
 
     @PatchMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> updateSelectedMember(
-            @PathVariable("id") String id,
-            @RequestBody StaffDTO staffDTO
-    ) {
+    public ResponseEntity<Void> updateSelectedMember(@PathVariable("id") String id, @RequestBody StaffDTO staffDTO) {
         try {
             staffService.updateStaff(id, staffDTO);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } catch (VehicleNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PatchMapping(value = "/{id}/return-vehicle")
+    public ResponseEntity<Void> returnVehicle(@PathVariable("id") String staffId) {
+        try {
+            staffService.returnVehicle(staffId);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (StaffMemberNotFoundException | VehicleNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             e.printStackTrace();

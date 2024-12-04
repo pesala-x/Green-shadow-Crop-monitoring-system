@@ -10,4 +10,5 @@ public interface StaffService {
     void deleteStaff(String id);
     void updateStaff(String id, StaffDTO staffDTO);
     List<StaffDTO> searchStaff  (String searchTerm);
+    void returnVehicle(String staffId);
 }

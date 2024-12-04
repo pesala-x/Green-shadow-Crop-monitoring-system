@@ -32,4 +32,5 @@ public class StaffDTO implements StaffStatus, StaffResponse {
     private String vehicleCode;
     private List<FieldDTO> fieldList = new ArrayList<>();
     private List<EquipmentDTO> equipmentList = new ArrayList<>();
+    private List<MonitoringLogDTO> monitoringLogList = new ArrayList<>();
 }
