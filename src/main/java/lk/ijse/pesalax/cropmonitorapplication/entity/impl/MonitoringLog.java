@@ -15,7 +15,7 @@ import java.util.Date;
 public class MonitoringLog {
     @Id
     private String log_code;
-    private Date log_date;
+    private String log_date;
     private String Observation;
     @Column(columnDefinition = "LONGTEXT")
     private String log_image;

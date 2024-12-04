@@ -5,6 +5,11 @@ import lk.ijse.pesalax.cropmonitorapplication.dao.FieldDAO;
 import lk.ijse.pesalax.cropmonitorapplication.dao.MonitoringLogDAO;
 import lk.ijse.pesalax.cropmonitorapplication.dao.StaffDAO;
 import lk.ijse.pesalax.cropmonitorapplication.dto.impl.MonitoringLogDTO;
+import lk.ijse.pesalax.cropmonitorapplication.entity.impl.Crop;
+import lk.ijse.pesalax.cropmonitorapplication.entity.impl.Field;
+import lk.ijse.pesalax.cropmonitorapplication.entity.impl.MonitoringLog;
+import lk.ijse.pesalax.cropmonitorapplication.entity.impl.Staff;
+import lk.ijse.pesalax.cropmonitorapplication.exception.DataPersistException;
 import lk.ijse.pesalax.cropmonitorapplication.service.MonitoringLogService;
 import lk.ijse.pesalax.cropmonitorapplication.util.Mapping;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +30,22 @@ public class MonitoringLogServiceIMPL implements MonitoringLogService {
 
     @Override
     public void saveMonitoringLog(MonitoringLogDTO monitoringLogDTO) {
+        Field field = fieldDAO.findById(monitoringLogDTO.getFieldCode())
+                .orElseThrow(() -> new DataPersistException("Invalid field code"));
+        Crop crop = cropDAO.findById(monitoringLogDTO.getCropCode())
+                .orElseThrow(() -> new DataPersistException("Invalid crop code"));
+        Staff staff = staffDAO.findById(monitoringLogDTO.getId())
+                .orElseThrow(() -> new DataPersistException("Invalid staff ID"));
 
+        MonitoringLog log = mapping.convertToMonitoringLog(monitoringLogDTO);
+        log.setField(field);
+        log.setCrop(crop);
+        log.setStaff(staff);
+
+        MonitoringLog savedLog = monitoringLogDAO.save(log);
+        if (savedLog == null) {
+            throw new DataPersistException("Can't save Monitoring Log");
+        }
     }
 
     @Override
