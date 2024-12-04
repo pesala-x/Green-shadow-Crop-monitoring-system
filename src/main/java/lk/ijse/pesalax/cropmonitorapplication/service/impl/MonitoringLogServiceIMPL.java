@@ -9,7 +9,7 @@ import lk.ijse.pesalax.cropmonitorapplication.entity.impl.Crop;
 import lk.ijse.pesalax.cropmonitorapplication.entity.impl.Field;
 import lk.ijse.pesalax.cropmonitorapplication.entity.impl.MonitoringLog;
 import lk.ijse.pesalax.cropmonitorapplication.entity.impl.Staff;
-import lk.ijse.pesalax.cropmonitorapplication.exception.DataPersistException;
+import lk.ijse.pesalax.cropmonitorapplication.exception.*;
 import lk.ijse.pesalax.cropmonitorapplication.service.MonitoringLogService;
 import lk.ijse.pesalax.cropmonitorapplication.util.Mapping;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -50,21 +51,57 @@ public class MonitoringLogServiceIMPL implements MonitoringLogService {
 
     @Override
     public List<MonitoringLogDTO> searchMonitoringLog(String searchTerm) {
-        return List.of();
+        List<MonitoringLog> logs = monitoringLogDAO.findByMonitoringLogCodeOrMonitoringLogDate(searchTerm, searchTerm);
+        return mapping.convertToMonitoringLogListDTO(logs);
     }
 
     @Override
     public List<MonitoringLogDTO> getAllMonitoringLog() {
-        return List.of();
+        List<MonitoringLog> logs = monitoringLogDAO.findAll();
+        return mapping.convertToMonitoringLogListDTO(logs);
     }
 
     @Override
     public void deleteMonitoringLog(String log_code) {
-
+        Optional<MonitoringLog> selectedLog = monitoringLogDAO.findById(log_code);
+        if (!selectedLog.isPresent()) {
+            throw new MonitoringLogNotFoundException(log_code);
+        } else {
+            monitoringLogDAO.deleteById(log_code);
+        }
     }
 
     @Override
-    public void updateMonitoringLog(String log_code, MonitoringLogDTO monitoringLogDTO) {
+    public void updateMonitoringLog(String log_code, MonitoringLogDTO logDTO) {
+        MonitoringLog existingLog = monitoringLogDAO.findById(log_code)
+                .orElseThrow(() -> new MonitoringLogNotFoundException(log_code));
 
+        if (logDTO.getLog_date() != null) {
+            existingLog.setLog_date(logDTO.getLog_date());
+        }
+        if (logDTO.getObservation() != null) {
+            existingLog.setObservation(logDTO.getObservation());
+        }
+        if (logDTO.getLog_image() != null) {
+            existingLog.setLog_image(logDTO.getLog_image());
+        }
+        if (logDTO.getFieldCode() != null) {
+            Field field = fieldDAO.findById(logDTO.getFieldCode())
+                    .orElseThrow(() -> new FieldNotFoundException("Field not found with code: " + logDTO.getFieldCode()));
+            existingLog.setField(field);
+        }
+
+        if (logDTO.getCropCode() != null) {
+            Crop crop = cropDAO.findById(logDTO.getCropCode())
+                    .orElseThrow(() -> new CropNotFoundException("Crop not found with code: " + logDTO.getCropCode()));
+            existingLog.setCrop(crop);
+        }
+
+        if (logDTO.getId() != null) {
+            Staff staff = staffDAO.findById(logDTO.getId())
+                    .orElseThrow(() -> new StaffMemberNotFoundException("Staff not found with ID: " + logDTO.getId()));
+            existingLog.setStaff(staff);
+        }
+        monitoringLogDAO.save(existingLog);
     }
 }
