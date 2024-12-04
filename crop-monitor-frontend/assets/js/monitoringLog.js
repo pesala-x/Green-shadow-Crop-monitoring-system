@@ -78,4 +78,163 @@ $(document).ready(function () {
       },
     });
   }
+
+  // Save Monitoring Log
+  $("#monitoringLogForm").on("submit", function (e) {
+    e.preventDefault();
+    let formData = new FormData(this);
+    formData.append("logCode", $("#logCode").val());
+    formData.append("logDate", $("#logDate").val());
+    formData.append("observation", $("#logDetails").val());
+    formData.append("logImage", $("#observedImage")[0].files[0]);
+    formData.append("fieldCode", $("#fieldSelect").val());
+    formData.append("cropCode", $("#cropSelect").val());
+    formData.append("staffId", $("#staffSelect").val());
+
+    $.ajax({
+      url: "http://localhost:5050/crop-monitor/api/v1/monitoringLog",
+      type: "POST",
+      data: formData,
+      contentType: false,
+      processData: false,
+      success: function () {
+        alert("Monitoring log saved successfully!");
+        $("#monitoringLogForm")[0].reset();
+        generateLogCode();
+      },
+      error: function () {
+        alert("Error saving monitoring log.");
+      },
+    });
+  });
+
+  // Get All Monitoring Logs
+  $("#getAllLogsBtn").on("click", function () {
+    $.ajax({
+      url: "http://localhost:5050/crop-monitor/api/v1/monitoringLog/allLogs",
+      type: "GET",
+      success: function (logs) {
+        let tableBody = $("#logTableBody");
+        tableBody.empty();
+        logs.forEach((log) => {
+          tableBody.append(`
+              <tr>
+                <td>${log.log_code}</td>
+                <td>${log.log_date}</td>
+                <td>${log.observation}</td>
+                <td>${log.fieldCode}</td>
+                <td>${log.cropCode}</td>
+                <td>${log.id}</td>
+                <td><img src="data:image/png;base64,${log.log_image}" style="max-height: 50px;"></td>
+              </tr>
+            `);
+        });
+        $("#logListModal").modal("show");
+      },
+      error: function () {
+        alert("Error retrieving monitoring logs.");
+      },
+    });
+  });
+
+  // Search Monitoring Log
+  $("#searchIcon").on("click", searchAndFillLogForm);
+  $("#searchLog").on("keypress", function (e) {
+    if (e.which === 13) searchAndFillLogForm();
+  });
+
+  function searchAndFillLogForm() {
+    const searchTerm = $("#searchLog").val().trim();
+    if (searchTerm === "") {
+      alert("Enter log code or observation.");
+      return;
+    }
+
+    $.ajax({
+      url: `http://localhost:5050/crop-monitor/api/v1/monitoringLog?searchTerm=${encodeURIComponent(
+        searchTerm
+      )}`,
+      type: "GET",
+      success: function (logs) {
+        if (logs.length === 0) {
+          alert("No matching log found.");
+          return;
+        }
+
+        const log = logs[0];
+        $("#logCode").val(log.log_code);
+        $("#logDate").val(log.log_date);
+        $("#logDetails").val(log.observation);
+        $("#fieldSelect").val(log.fieldCode).change();
+        $("#cropSelect").val(log.cropCode).change();
+        $("#staffSelect").val(log.id).change();
+
+        if (log.log_image) {
+          $("#previewObservedImage")
+            .attr("src", `data:image/png;base64,${log.log_image}`)
+            .show();
+        } else {
+          $("#previewObservedImage").hide();
+        }
+      },
+      error: function () {
+        alert("Error retrieving monitoring log.");
+      },
+    });
+  }
+
+  // Update Monitoring Log
+  $("#updateLogBtn").on("click", function () {
+    let formData = new FormData();
+    formData.append("logDate", $("#logDate").val());
+    formData.append("observation", $("#logDetails").val());
+    formData.append("fieldCode", $("#fieldSelect").val());
+    formData.append("cropCode", $("#cropSelect").val());
+    formData.append("staffId", $("#staffSelect").val());
+    if ($("#observedImage")[0].files[0]) {
+      formData.append("observedImage", $("#observedImage")[0].files[0]);
+    }
+
+    $.ajax({
+      url: `http://localhost:5050/crop-monitor/api/v1/monitoringLog/${$(
+        "#logCode"
+      ).val()}`,
+      type: "PATCH",
+      data: formData,
+      contentType: false,
+      processData: false,
+      success: function () {
+        alert("Monitoring log updated successfully!");
+      },
+      error: function () {
+        alert("Error updating monitoring log.");
+      },
+    });
+  });
+
+  // Delete Monitoring Log
+  $("#deleteLogBtn").on("click", function () {
+    const logCode = $("#logCode").val();
+    if (confirm("Are you sure you want to delete this log?")) {
+      $.ajax({
+        url: `http://localhost:5050/crop-monitor/api/v1/monitoringLog/${logCode}`,
+        type: "DELETE",
+        success: function () {
+          alert("Monitoring log deleted successfully!");
+          $("#logForm")[0].reset();
+          generateLogCode();
+        },
+        error: function () {
+          alert("Error deleting monitoring log.");
+        },
+      });
+    }
+  });
+
+  // Clear Monitoring Log Form
+  $("#clearLogBtn").on("click", function () {
+    $("#monitoringLogForm")[0].reset();
+    generateLogCode();
+    $("#previewObservedImage").hide();
+  });
 });
