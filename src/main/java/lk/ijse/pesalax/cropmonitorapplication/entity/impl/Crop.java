@@ -4,11 +4,14 @@ import jakarta.persistence.*;
 import lk.ijse.pesalax.cropmonitorapplication.entity.SuperEntity;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-@ToString(exclude = "field")
+@ToString(exclude = {"field","monitoringLogList"})
 @Entity
 @Table(name = "crops")
 public class Crop implements SuperEntity {
@@ -23,4 +26,6 @@ public class Crop implements SuperEntity {
     @ManyToOne
     @JoinColumn(name = "fieldCode", nullable = false)
     private Field field;
+    @OneToMany(mappedBy = "crop")
+    private List<MonitoringLog> monitoringLogList = new ArrayList<>();
 }
