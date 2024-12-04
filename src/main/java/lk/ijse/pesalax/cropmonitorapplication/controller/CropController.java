@@ -19,7 +19,7 @@ import java.util.List;
 @RestController
 @RequestMapping(value = "api/v1/crops")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://127.0.0.1:5500")
+@CrossOrigin(origins = "http://127.0.0.1:5501")
 public class CropController {
     private final CropService cropService;
 
