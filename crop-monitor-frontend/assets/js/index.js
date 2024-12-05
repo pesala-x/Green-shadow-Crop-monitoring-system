@@ -25,7 +25,7 @@ $("#signInForm").on("submit", function (e) {
       localStorage.setItem("userRole", response.role); // Store user role
 
       // Redirect to dashboard
-      window.location.href = "/sidebar.html";
+      window.location.href = "/pages/dashboard.html";
     },
     error: function (xhr) {
       alert("Login failed: " + xhr.responseText);
