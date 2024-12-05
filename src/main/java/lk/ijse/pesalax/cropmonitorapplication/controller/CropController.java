@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,9 +22,9 @@ import java.util.List;
 @RequiredArgsConstructor
 @CrossOrigin(origins = "http://127.0.0.1:5501")
 public class CropController {
-    private final CropService cropService;
 
-    //    --Save Crop--
+    private final CropService cropService;
+    @PreAuthorize("hasAnyRole('MANAGER', 'SCIENTIST')")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> saveCrop(
             @RequestParam("cropCode") String cropCode,
@@ -79,6 +80,7 @@ public class CropController {
         return new ResponseEntity<>(crops, HttpStatus.OK);
     }
 
+    @PreAuthorize("hasAnyRole('MANAGER', 'SCIENTIST')")
     @DeleteMapping(value = "/{code}")
     public ResponseEntity<Void> deleteSelectedCrop(@PathVariable("code") String code) {
         try {
@@ -91,6 +93,7 @@ public class CropController {
         }
     }
 
+    @PreAuthorize("hasAnyRole('MANAGER', 'SCIENTIST')")
     @PatchMapping(value = "/{cropCode}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Void> updateSelectedCrop(
             @PathVariable("cropCode") String cropCode,
