@@ -11,7 +11,7 @@ $(document).ready(function () {
   // Load vehicles for the dropdown
   function loadVehicles() {
     $.ajax({
-      url: "http://localhost:5050/cropmonitoring/api/v1/vehicles/allVehicles",
+      url: "http://localhost:5050/crop-monitor/api/v1/vehicles/allVehicles",
       method: "GET",
       headers: {
         Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
@@ -62,7 +62,7 @@ $(document).ready(function () {
     };
 
     $.ajax({
-      url: "http://localhost:5050/cropmonitoring/api/v1/staff",
+      url: "http://localhost:5050/crop-monitor/api/v1/staff",
       type: "POST",
       contentType: "application/json",
       data: JSON.stringify(staffData),
@@ -111,7 +111,7 @@ $(document).ready(function () {
     }
 
     $.ajax({
-      url: `http://localhost:5050/cropmonitoring/api/v1/staff?searchTerm=${encodeURIComponent(
+      url: `http://localhost:5050/crop-monitor/api/v1/staff?searchTerm=${encodeURIComponent(
         searchTerm
       )}`,
       type: "GET",
@@ -188,7 +188,7 @@ $(document).ready(function () {
     };
 
     $.ajax({
-      url: `http://localhost:5050/cropmonitoring/api/v1/staff/${staffId}`,
+      url: `http://localhost:5050/crop-monitor/api/v1/staff/${staffId}`,
       type: "PATCH",
       contentType: "application/json",
       data: JSON.stringify(staffData),
@@ -221,7 +221,7 @@ $(document).ready(function () {
     const staffId = $("#staffId").val();
     if (confirm("Are you sure you want to delete this staff member?")) {
       $.ajax({
-        url: `http://localhost:5050/cropmonitoring/api/v1/staff/${staffId}`,
+        url: `http://localhost:5050/crop-monitor/api/v1/staff/${staffId}`,
         type: "DELETE",
         headers: {
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
@@ -274,7 +274,7 @@ $(document).ready(function () {
   $("#getAllBtn").click(function () {
     console.log("Fetching all staff...");
     $.ajax({
-      url: "http://localhost:5050/cropmonitoring/api/v1/staff/allstaff",
+      url: "http://localhost:5050/crop-monitor/api/v1/staff/allstaff",
       type: "GET",
       headers: {
         Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
@@ -311,15 +311,21 @@ $(document).ready(function () {
               <td>${staff.contactNo}</td>
               <td>${staff.email}</td>
               <td>
-                ${staff.vehicleCode ? staff.vehicleCode : ""}
                 ${
-                  staff.vehicleCode && !isReturned
-                    ? `<button class="btn btn-sm btn-primary return-btn" data-staff-id="${staff.id}" data-vehicle-code="${staff.vehicleCode}">Return</button>`
+                  staff.vehicleCode
+                    ? `${staff.vehicleCode} ${
+                        !isReturned
+                          ? `<button class="btn btn-sm btn-primary return-btn"
+                                data-staff-id="${staff.id}"
+                                data-vehicle-code="${staff.vehicleCode}">
+                                Return
+                            </button>`
+                          : ""
+                      }`
                     : "Not Allocated"
                 }
               </td>
-            </tr>
-          `;
+            </tr>`;
         });
 
         $("#staffTableBody1").html(staffRows1);
@@ -332,7 +338,7 @@ $(document).ready(function () {
 
           // Update vehicle status in backend
           $.ajax({
-            url: `http://localhost:5050/cropmonitoring/api/v1/staff/${staffId}/return-vehicle`,
+            url: `http://localhost:5050/crop-monitor/api/v1/staff/${staffId}/return-vehicle`,
             type: "PATCH",
             headers: {
               Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
