@@ -24,13 +24,28 @@ $(document).ready(function () {
       data: JSON.stringify(Object.fromEntries(formData)),
       contentType: "application/json",
       processData: false,
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
       success: function (response) {
         alert("Vehicle saved successfully!");
         $("#vehicleForm")[0].reset();
         generateVehicleCode();
       },
-      error: function (xhr, status, error) {
-        alert(xhr.responseText);
+
+      error: function (xhr) {
+        if (xhr.status === 401) {
+          // Handle session expiration
+          if (confirm("Session expired. Please log in again.")) {
+            window.location.href = "/index.html";
+          }
+        } else if (xhr.status === 403) {
+          // Handle insufficient permissions
+          alert("You do not have permission to perform this action.");
+        } else {
+          // Handle other errors
+          alert("Error saving vehicle: " + (xhr.responseText || "An unexpected error occurred."));
+        }
       },
     });
   });
@@ -59,6 +74,9 @@ $(document).ready(function () {
       )}`,
       type: "GET",
       contentType: "application/json",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
       success: function (data) {
         if (data.length === 0) {
           alert("No matching vehicle found.");
@@ -73,8 +91,17 @@ $(document).ready(function () {
         $("#status").val(vehicle.status).change();
         $("#remarks").val(vehicle.remarks);
       },
+
       error: function (xhr) {
-        alert("Error retrieving vehicle data: " + xhr.responseText);
+        if (xhr.status === 401)
+          // Handle session expiration
+          if (confirm("Session expired. Please log in again.")) {
+            window.location.href = "/index.html";
+          }
+        else {
+          // Handle other errors
+          alert("Error retrieving vehicle data : " + (xhr.responseText || "An unexpected error occurred."));
+        }
       },
     });
   }
@@ -97,12 +124,27 @@ $(document).ready(function () {
       type: "PATCH",
       data: JSON.stringify(formData),
       contentType: "application/json",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
       success: function () {
         alert("Vehicle updated successfully!");
         clearForm();
       },
+
       error: function (xhr) {
-        alert("Failed to update vehicle: " + xhr.responseText);
+        if (xhr.status === 401) {
+          // Handle session expiration
+          if (confirm("Session expired. Please log in again.")) {
+            window.location.href = "/index.html";
+          }
+        } else if (xhr.status === 403) {
+          // Handle insufficient permissions
+          alert("You do not have permission to perform this action.");
+        } else {
+          // Handle other errors
+          alert("Error update vehicle: " + (xhr.responseText || "An unexpected error occurred."));
+        }
       },
     });
   });
@@ -115,12 +157,27 @@ $(document).ready(function () {
     $.ajax({
       url: `http://localhost:5050/crop-monitor/api/v1/vehicles/${vehicleCode}`,
       type: "DELETE",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
       success: function () {
         alert("Vehicle deleted successfully!");
         clearForm();
       },
+
       error: function (xhr) {
-        alert("Failed to delete vehicle: " + xhr.responseText);
+        if (xhr.status === 401) {
+          // Handle session expiration
+          if (confirm("Session expired. Please log in again.")) {
+            window.location.href = "/index.html";
+          }
+        } else if (xhr.status === 403) {
+          // Handle insufficient permissions
+          alert("You do not have permission to perform this action.");
+        } else {
+          // Handle other errors
+          alert("Error delete vehicle: " + (xhr.responseText || "An unexpected error occurred."));
+        }
       },
     });
   });
@@ -130,6 +187,9 @@ $(document).ready(function () {
     $.ajax({
       url: "http://localhost:5050/crop-monitor/api/v1/vehicles/allVehicles",
       type: "GET",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
       success: function (vehicles) {
         let vehicleRows = "";
         vehicles.forEach((vehicle) => {
@@ -146,8 +206,17 @@ $(document).ready(function () {
         });
         $("#vehicleTableBody").html(vehicleRows);
       },
+
       error: function (xhr) {
-        alert("Failed to fetch vehicles: " + xhr.responseText);
+        if (xhr.status === 401)
+          // Handle session expiration
+          if (confirm("Session expired. Please log in again.")) {
+            window.location.href = "/index.html";
+          }
+        else {
+          // Handle other errors
+          alert("Failed to fetch vehicles : " + (xhr.responseText || "An unexpected error occurred."));
+        }
       },
     });
   });
