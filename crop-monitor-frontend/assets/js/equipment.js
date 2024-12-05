@@ -9,29 +9,35 @@ $(document).ready(function () {
     $("#equipmentId").val(id);
   }
 
-// Load Staff Dropdown
-function loadStaffDropdown() {
-  $.ajax({
-    url: "http://localhost:5050/crop-monitor/api/v1/staff/allstaff",
-    method: "GET",
-    success: function (staffList) {
-      staffList.forEach((staff) => {
-        $("#assignedStaff").append(
-          `<option value="${staff.id}">${staff.id} - ${staff.firstName} ${staff.lastName}</option>`
-        );
-      });
-    },
-    error: function () {
-      alert("Failed to load staff data.");
-    },
-  });
-}
+  // Load Staff Dropdown
+  function loadStaffDropdown() {
+    $.ajax({
+      url: "http://localhost:5050/crop-monitor/api/v1/staff/allstaff",
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
+      success: function (staffList) {
+        staffList.forEach((staff) => {
+          $("#assignedStaff").append(
+            `<option value="${staff.id}">${staff.id} - ${staff.firstName} ${staff.lastName}</option>`
+          );
+        });
+      },
+      error: function () {
+        alert("Failed to load staff data.");
+      },
+    });
+  }
 
   // Load Field Dropdown
   function loadFieldDropdown() {
     $.ajax({
       url: "http://localhost:5050/crop-monitor/api/v1/fields/allFields",
       method: "GET",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
       success: function (fieldList) {
         fieldList.forEach((field) => {
           $("#assignedField").append(
@@ -63,13 +69,28 @@ function loadStaffDropdown() {
       data: JSON.stringify(Object.fromEntries(formData)),
       contentType: "application/json",
       processData: false,
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
       success: function (response) {
         alert("Equipment saved successfully!");
         $("#equipmentForm")[0].reset();
         //
       },
-      error: function (xhr, status, error) {
-        alert("Error saving equipment: " + xhr.responseJSON.message);
+
+      error: function (xhr) {
+        if (xhr.status === 401) {
+          // Handle session expiration
+          if (confirm("Session expired. Please log in again.")) {
+            window.location.href = "/index.html";
+          }
+        } else if (xhr.status === 403) {
+          // Handle insufficient permissions
+          alert("You do not have permission to perform this action.");
+        } else {
+          // Handle other errors
+          alert("Error saving equipment: " + (xhr.responseText || "An unexpected error occurred."));
+        }
       },
     });
   });
@@ -80,6 +101,9 @@ function loadStaffDropdown() {
       url: "http://localhost:5050/crop-monitor/api/v1/equipment/allEquipment",
       type: "GET",
       contentType: "application/json",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
       success: function (data) {
         let tableBody = $("#equipmentTableBody");
         tableBody.empty();
@@ -97,55 +121,76 @@ function loadStaffDropdown() {
         });
         $("#equipmentListModal").modal("show");
       },
-      error: function () {
-        alert("Error retrieving equipment list.");
+
+      error: function (xhr) {
+        if (xhr.status === 401)
+          // Handle session expiration
+          if (confirm("Session expired. Please log in again.")) {
+            window.location.href = "/index.html";
+          }
+        else {
+          // Handle other errors
+          alert("Error retrieving equipment list: " + (xhr.responseText || "An unexpected error occurred."));
+        }
       },
     });
   });
 
-// Search Equipment
-$("#searchIcon").on("click", function () {
-  searchAndFillEquipmentForm();
-});
-
-$("#searchEquipment").on("keypress", function (e) {
-  if (e.which == 13) {
+  // Search Equipment
+  $("#searchIcon").on("click", function () {
     searchAndFillEquipmentForm();
-  }
-});
-
-function searchAndFillEquipmentForm() {
-  const searchTerm = $("#searchEquipment").val().trim();
-  if (searchTerm === "") {
-    alert("Please enter an equipment code or name.");
-    return;
-  }
-
-  $.ajax({
-    url: `http://localhost:5050/crop-monitor/api/v1/equipment?searchTerm=${encodeURIComponent(
-      searchTerm
-    )}`,
-    type: "GET",
-    contentType: "application/json",
-    success: function (data) {
-      if (data.length === 0) {
-        alert("No matching equipment found.");
-        return;
-      }
-
-      const equipment = data[0];
-      $("#equipmentId").val(equipment.equipmentId);
-      $("#equipmentName").val(equipment.equipmentName);
-      $("#equipmentType").val(equipment.equipmentType).change();
-      $("#status").val(equipment.equipmentStatus).change();
-      $("#assignedField").val(equipment.fieldCode).change();
-      $("#assignedStaff").val(equipment.id).change();
-    },
-    error: function (xhr, status, error) {
-      alert("Error retrieving equipment data: " + xhr.responseJSON.message);
-    },
   });
-}
+
+  $("#searchEquipment").on("keypress", function (e) {
+    if (e.which == 13) {
+      searchAndFillEquipmentForm();
+    }
+  });
+
+  function searchAndFillEquipmentForm() {
+    const searchTerm = $("#searchEquipment").val().trim();
+    if (searchTerm === "") {
+      alert("Please enter an equipment code or name.");
+      return;
+    }
+
+    $.ajax({
+      url: `http://localhost:5050/crop-monitor/api/v1/equipment?searchTerm=${encodeURIComponent(
+        searchTerm
+      )}`,
+      type: "GET",
+      contentType: "application/json",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
+      success: function (data) {
+        if (data.length === 0) {
+          alert("No matching equipment found.");
+          return;
+        }
+
+        const equipment = data[0];
+        $("#equipmentId").val(equipment.equipmentId);
+        $("#equipmentName").val(equipment.equipmentName);
+        $("#equipmentType").val(equipment.equipmentType).change();
+        $("#status").val(equipment.equipmentStatus).change();
+        $("#assignedField").val(equipment.fieldCode).change();
+        $("#assignedStaff").val(equipment.id).change();
+      },
+
+      error: function (xhr) {
+        if (xhr.status === 401)
+          // Handle session expiration
+          if (confirm("Session expired. Please log in again.")) {
+            window.location.href = "/index.html";
+          }
+        else {
+          // Handle other errors
+          alert("Error searching equipment: " + (xhr.responseText || "An unexpected error occurred."));
+        }
+      },
+    });
+  }
 
   // Update Equipment
   $("#updateBtn").click(function () {
@@ -165,33 +210,63 @@ function searchAndFillEquipmentForm() {
       type: "PATCH",
       data: JSON.stringify(formData),
       contentType: "application/json",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
       success: function () {
         alert("Equipment updated successfully!");
         clearForm();
       },
+
       error: function (xhr) {
-        alert("Failed to update Equipment: " + xhr.responseText);
+        if (xhr.status === 401) {
+          // Handle session expiration
+          if (confirm("Session expired. Please log in again.")) {
+            window.location.href = "/index.html";
+          }
+        } else if (xhr.status === 403) {
+          // Handle insufficient permissions
+          alert("You do not have permission to perform this action.");
+        } else {
+          // Handle other errors
+          alert("Error update Equipment: " + (xhr.responseText || "An unexpected error occurred."));
+        }
       },
     });
   });
 
-// Delete Equipment
-$("#deleteBtn").click(function () {
-  const equipmentId = $("#equipmentId").val();
-  if (!equipmentId) return alert("Please enter Equipment Id to delete.");
+  // Delete Equipment
+  $("#deleteBtn").click(function () {
+    const equipmentId = $("#equipmentId").val();
+    if (!equipmentId) return alert("Please enter Equipment Id to delete.");
 
-  $.ajax({
-    url: `http://localhost:5050/crop-monitor/api/v1/equipment/${equipmentId}`,
-    type: "DELETE",
-    success: function () {
-      alert("Equipment deleted successfully!");
-      clearForm();
-    },
-    error: function (xhr) {
-      alert("Failed to delete Equipment: " + xhr.responseText);
-    },
+    $.ajax({
+      url: `http://localhost:5050/crop-monitor/api/v1/equipment/${equipmentId}`,
+      type: "DELETE",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
+      success: function () {
+        alert("Equipment deleted successfully!");
+        clearForm();
+      },
+
+      error: function (xhr) {
+        if (xhr.status === 401) {
+          // Handle session expiration
+          if (confirm("Session expired. Please log in again.")) {
+            window.location.href = "/index.html";
+          }
+        } else if (xhr.status === 403) {
+          // Handle insufficient permissions
+          alert("You do not have permission to perform this action.");
+        } else {
+          // Handle other errors
+          alert("Error delete Equipment: " + (xhr.responseText || "An unexpected error occurred."));
+        }
+      },
+    });
   });
-});
 
   // Clear form
   $(document).ready(function () {
