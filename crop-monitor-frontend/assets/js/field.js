@@ -214,3 +214,10 @@ $(document).ready(function () {
     $("#previewCropImage").hide(); // hide preview if any
   });
 });
+
+$(document).ready(function () {
+  $("#assigment").click(function () {
+    window.location.href = "gfieldStaffAssign.html";
+  });
+});
+
