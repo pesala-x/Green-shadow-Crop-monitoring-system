@@ -13,6 +13,9 @@ $(document).ready(function () {
     $.ajax({
       url: "http://localhost:5050/crop-monitor/api/v1/fields/allFields", // Endpoint to fetch fields
       method: "GET",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
       success: function (fields) {
         $("#field")
           .empty()
@@ -52,12 +55,27 @@ $(document).ready(function () {
       data: formData,
       contentType: false,
       processData: false,
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
       success: function (response) {
         alert("Crop saved successfully!");
         $("#cropForm")[0].reset();
       },
-      error: function (xhr, status, error) {
-        alert("Error saving crop: " + xhr.responseJSON.message);
+
+      error: function (xhr) {
+        if (xhr.status === 401) {
+          // Handle session expiration
+          if (confirm("Session expired. Please log in again.")) {
+            window.location.href = "/index.html";
+          }
+        } else if (xhr.status === 403) {
+          // Handle insufficient permissions
+          alert("You do not have permission to perform this action.");
+        } else {
+          // Handle other errors
+          alert("Error saving crop: " + (xhr.responseText || "An unexpected error occurred."));
+        }
       },
     });
   });
@@ -68,6 +86,9 @@ $(document).ready(function () {
       url: "http://localhost:5050/crop-monitor/api/v1/crops/allcrops",
       type: "GET",
       contentType: "application/json",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
       success: function (data) {
         let tableBody = $("#cropTableBody");
         tableBody.empty();
@@ -86,8 +107,17 @@ $(document).ready(function () {
         });
         $("#cropListModal").modal("show");
       },
-      error: function () {
-        alert("Error retrieving crop list.");
+
+      error: function (xhr) {
+        if (xhr.status === 401)
+          // Handle session expiration
+          if (confirm("Session expired. Please log in again.")) {
+            window.location.href = "/index.html";
+          }
+        else {
+          // Handle other errors
+          alert("Error retrieving crop list: " + (xhr.responseText || "An unexpected error occurred."));
+        }
       },
     });
   });
@@ -116,6 +146,9 @@ $(document).ready(function () {
       )}`,
       type: "GET",
       contentType: "application/json",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
       success: function (data) {
         if (data.length === 0) {
           alert("No matching crop found.");
@@ -138,8 +171,17 @@ $(document).ready(function () {
           $("#previewCropImage").hide();
         }
       },
-      error: function (xhr, status, error) {
-        alert("Error retrieving crop data: " + xhr.responseJSON.message);
+
+      error: function (xhr) {
+        if (xhr.status === 401)
+          // Handle session expiration
+          if (confirm("Session expired. Please log in again.")) {
+            window.location.href = "/index.html";
+          }
+        else {
+          // Handle other errors
+          alert("Error searching crop: " + (xhr.responseText || "An unexpected error occurred."));
+        }
       },
     });
   }
@@ -164,11 +206,26 @@ $(document).ready(function () {
       data: formData,
       contentType: false,
       processData: false,
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
       success: function () {
         alert("Crop updated successfully!");
       },
-      error: function () {
-        alert("Error updating crop.");
+
+      error: function (xhr) {
+        if (xhr.status === 401) {
+          // Handle session expiration
+          if (confirm("Session expired. Please log in again.")) {
+            window.location.href = "/index.html";
+          }
+        } else if (xhr.status === 403) {
+          // Handle insufficient permissions
+          alert("You do not have permission to perform this action.");
+        } else {
+          // Handle other errors
+          alert("Error updating crop: " + (xhr.responseText || "An unexpected error occurred."));
+        }
       },
     });
   });
@@ -180,13 +237,28 @@ $(document).ready(function () {
       $.ajax({
         url: `http://localhost:5050/crop-monitor/api/v1/crops/${cropCode}`,
         type: "DELETE",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
         success: function () {
           alert("Crop deleted successfully!");
           $("#cropForm")[0].reset();
           generateCropCode();
         },
-        error: function () {
-          alert("Error deleting crop.");
+
+        error: function (xhr) {
+          if (xhr.status === 401) {
+            // Handle session expiration
+            if (confirm("Session expired. Please log in again.")) {
+              window.location.href = "/index.html";
+            }
+          } else if (xhr.status === 403) {
+            // Handle insufficient permissions
+            alert("You do not have permission to perform this action.");
+          } else {
+            // Handle other errors
+            alert("Error deleting crop: " + (xhr.responseText || "An unexpected error occurred."));
+          }
         },
       });
     }
@@ -198,6 +270,4 @@ $(document).ready(function () {
     generateCropCode();
     $("#previewCropImage").hide(); // hide preview if any
   });
-
 });
-
