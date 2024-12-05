@@ -139,6 +139,9 @@ public class StaffServiceIMPL implements StaffService {
 
         vehicle.setStatus("available");
         vehicleDAO.save(vehicle);
+
+        staff.setVehicle(null);
+        staffDAO.save(staff);
     }
 }
 
