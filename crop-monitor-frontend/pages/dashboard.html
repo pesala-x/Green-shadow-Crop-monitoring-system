@@ -19,6 +19,7 @@
     <link rel="stylesheet" href="/assets/css/loader.css" />
     <link rel="stylesheet" href="/assets/css/sidebar.css" />
     <link rel="stylesheet" href="/assets/css/styles.css" />
+    <link rel="stylesheet" href="/assets/css/dashboard.css">
   </head>
   <body>
     <div id="page-loader" class="loader-wrapper">
@@ -29,8 +30,77 @@
     <!-- Main Content -->
     <div id="content" style="margin-left: 260px; margin-top: 60px">
       <div class="form-container">
-        <h1>Dashborad</h1>
-        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur, necessitatibus illo, nulla nobis iure ab rerum ea quos atque inventore laudantium distinctio adipisci deleniti reprehenderit debitis voluptatibus ex sit totam natus obcaecati tempore labore dicta! Qui illo commodi et ea praesentium, iure amet est quod, blanditiis aperiam laborum, minima impedit.</p>
+        <section id="DashboardForm">
+          <div class="topbar">
+              <div class="toggle">
+                  <ion-icon name="menu-outline"></ion-icon>
+              </div>
+              <!-- search -->
+              <div class="search">
+                  <label>
+                      <input type="text" placeholder="Search here">
+                      <ion-icon name="search-outline"></ion-icon>
+                  </label>
+              </div>
+              <!-- settingsImg -->
+              <div class="settings">
+                  <img src="/assests/icons/SettingsIcon.png">
+              </div>
+          </div>
+
+          <div class="cardBox">
+              <div class="card" id="staff">
+                  <div>
+                      <div class="numbers">12</div>
+                      <div class="cardName">Staff</div>
+                  </div>
+                  <div class="iconBx">
+                      <ion-icon name="people-outline"></ion-icon>
+                  </div>
+              </div>
+
+              <div class="card">
+                  <div>
+                      <div class="numbers">8</div>
+                      <div class="cardName">Crops</div>
+                  </div>
+                  <div class="iconBx">
+                      <ion-icon name="leaf-outline"></ion-icon>
+                  </div>
+              </div>
+              <div class="card" id="vehicles">
+                  <div>
+                      <div class="numbers">18</div>
+                      <div class="cardName">Vehicles</div>
+                  </div>
+                  <div class="iconBx">
+                      <ion-icon name="car-outline"></ion-icon>
+                  </div>
+              </div>
+              <div class="card" id="equipments">
+                  <div>
+                      <div class="numbers">43</div>
+                      <div class="cardName">Equipments</div>
+                  </div>
+                  <div class="iconBx">
+                      <ion-icon name="construct-outline"></ion-icon>
+                  </div>
+              </div>
+          </div>
+
+          <!-- Polar Chart -->
+          <div class="charts">
+              <div class="charts-card">
+                  <h2 class="chart-title">Top Crops</h2>
+                  <div id="polar-chart"></div>
+              </div>
+              <div class="charts-card">
+                  <h2 class="chart-title">Stacked Data</h2>
+                  <div id="line-chart"></div>
+              </div>
+          </div>
+       </section>
+
         </div>
     </div>
 
@@ -39,5 +109,6 @@
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="/assets/js/loader.js"></script>
     <script src="/assets/js/sidebarController.js"></script>
+    <script src="/assets/js/dashboard.js"></script>
   </body>
 </html>
