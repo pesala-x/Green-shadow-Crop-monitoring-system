@@ -21,12 +21,14 @@ $(document).ready(function () {
           .empty()
           .append("<option disabled selected>Select Vehicle</option>");
         vehicles.forEach((vehicle) => {
-          $("#vehicleList").append(
-            new Option(
-              `${vehicle.vehicleCode} - ${vehicle.vehicleCategory}`,
-              vehicle.vehicleCode
-            )
-          );
+          if (vehicle.status && vehicle.status.toLowerCase() === "available") {
+            $("#vehicleList").append(
+              new Option(
+                `${vehicle.vehicleCode} - ${vehicle.vehicleCategory}`,
+                vehicle.vehicleCode
+              )
+            );
+          }
         });
         $("#vehicleList").append(new Option("Not Allocated", "not-allocated"));
       },
