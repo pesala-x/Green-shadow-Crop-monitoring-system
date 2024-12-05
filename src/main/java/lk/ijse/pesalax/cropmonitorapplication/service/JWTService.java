@@ -9,6 +9,5 @@ public interface JWTService {
 
     boolean isTokenValid(String token, UserDetails userDetails);
 
-    String refreshToken(UserDetails userDetails);
 }
 

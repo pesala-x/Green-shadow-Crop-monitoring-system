@@ -8,6 +8,4 @@ public interface AuthenticationService {
     JWTAuthResponse signIn(SignInRequest signInRequest);
 
     JWTAuthResponse signUp(SignUpRequest signUpRequest);
-
-    JWTAuthResponse refreshToken(String accessToken);
 }

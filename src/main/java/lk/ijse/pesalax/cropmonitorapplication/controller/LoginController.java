@@ -29,9 +29,4 @@ public class LoginController {
         return ResponseEntity.ok(
                 authenticationService.signUp(signUpRequest));
     }
-
-    @PostMapping("refresh")
-    public ResponseEntity<JWTAuthResponse> refreshToken (@RequestParam ("refreshToken") String refreshToken) {
-        return ResponseEntity.ok(authenticationService.refreshToken(refreshToken));
-    }
 }
