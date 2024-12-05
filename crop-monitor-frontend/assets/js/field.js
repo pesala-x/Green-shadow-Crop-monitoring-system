@@ -33,12 +33,28 @@ $("#fieldForm").on("submit", function (e) {
     data: formData,
     contentType: false,
     processData: false,
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+    },
     success: function (response) {
       alert("Field saved successfully!");
       $("#fieldForm")[0].reset();
+      generateFieldCode();
     },
-    error: function (xhr, status, error) {
-      alert("Error saving field: " + xhr.responseJSON.message);
+
+    error: function (xhr) {
+      if (xhr.status === 401) {
+        // Handle session expiration
+        if (confirm("Session expired. Please log in again.")) {
+          window.location.href = "/index.html";
+        }
+      } else if (xhr.status === 403) {
+        // Handle insufficient permissions
+        alert("You do not have permission to perform this action.");
+      } else {
+        // Handle other errors
+        alert("Error saving field: " + (xhr.responseText || "An unexpected error occurred."));
+      }
     },
   });
 });
