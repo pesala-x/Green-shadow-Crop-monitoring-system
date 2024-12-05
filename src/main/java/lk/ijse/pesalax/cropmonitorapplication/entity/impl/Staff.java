@@ -33,7 +33,7 @@ public class Staff implements SuperEntity {
     private String contactNo;
     private String email;
     @ManyToOne
-    @JoinColumn(name = "vehicleCode",nullable = false)
+    @JoinColumn(name = "vehicleCode",nullable = true)
     private Vehicle vehicle;
     @OneToMany(mappedBy = "staff", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<FieldStaffAssignment> assignments = new ArrayList<>();
