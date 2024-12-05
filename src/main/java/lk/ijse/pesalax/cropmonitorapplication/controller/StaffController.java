@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,6 +21,8 @@ import java.util.List;
 @CrossOrigin(origins = "http://127.0.0.1:5501")
 public class StaffController {
     private final StaffService staffService;
+
+    @PreAuthorize("hasAnyRole('MANAGER', 'ADMINISTRATIVE')")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> saveStaffMember(@RequestBody StaffDTO staff) {
         if (staff == null) {
@@ -41,6 +44,7 @@ public class StaffController {
         return staffService.getAllStaffs();
     }
 
+    @PreAuthorize("hasAnyRole('MANAGER', 'ADMINISTRATIVE')")
     @DeleteMapping(value = "/{id}")
     public ResponseEntity<Void> deleteSelectedMember(@PathVariable("id") String id) {
         try {
@@ -59,6 +63,7 @@ public class StaffController {
         return new ResponseEntity<>(staffDTOS, HttpStatus.OK);
     }
 
+    @PreAuthorize("hasAnyRole('MANAGER', 'ADMINISTRATIVE')")
     @PatchMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> updateSelectedMember(@PathVariable("id") String id, @RequestBody StaffDTO staffDTO) {
         try {
@@ -72,6 +77,7 @@ public class StaffController {
         }
     }
 
+    @PreAuthorize("hasAnyRole('MANAGER', 'ADMINISTRATIVE')")
     @PatchMapping(value = "/{id}/return-vehicle")
     public ResponseEntity<Void> returnVehicle(@PathVariable("id") String staffId) {
         try {
