@@ -143,6 +143,13 @@ $(document).ready(function () {
         $("#address4").val(staff.addressLine04);
         $("#address5").val(staff.addressLine05);
         $("#vehicleList").val(staff.vehicleCode).change();
+
+        if (staff.vehicleCode === null || staff.vehicleCode.trim() === "") {
+          $("#vehicleList").val("not-allocated").change();
+        } else {
+          $("#vehicleList").val(staff.vehicleCode).change();
+        }
+
       },
 
       error: function (xhr) {
