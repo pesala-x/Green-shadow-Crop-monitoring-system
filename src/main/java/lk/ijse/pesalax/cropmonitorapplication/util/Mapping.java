@@ -105,5 +105,17 @@ public class Mapping {
             return monitoringLogDTO;
         }).collect(Collectors.toList());
     }
+
+    //FieldAssigmentStaff mappings
+    public List<FieldStaffAssignmentDTO> convertToFieldStaffAssignmentDTOList(List<FieldStaffAssignment> fieldStaffAssignments) {
+        return fieldStaffAssignments.stream()
+                .map(assignment -> {
+                    FieldStaffAssignmentDTO fieldStaffAssignmentDTO = modelMapper.map(assignment, FieldStaffAssignmentDTO.class);
+                    fieldStaffAssignmentDTO.setFieldCode(assignment.getField().getFieldCode());
+                    fieldStaffAssignmentDTO.setStaffId(assignment.getStaff().getId().toString());
+                    return fieldStaffAssignmentDTO;
+                })
+                .collect(Collectors.toList());
+    }
 }
 

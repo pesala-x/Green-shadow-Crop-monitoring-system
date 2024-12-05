@@ -3,9 +3,12 @@ package lk.ijse.pesalax.cropmonitorapplication.controller;
 import lk.ijse.pesalax.cropmonitorapplication.dto.impl.FieldStaffAssignmentDTO;
 import lk.ijse.pesalax.cropmonitorapplication.service.FieldAssignmentStaffService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping(value = "api/v1/assignment")
@@ -19,5 +22,10 @@ public class FieldAssignmentStaffController {
     public ResponseEntity<String> saveAssignment(@RequestBody FieldStaffAssignmentDTO assignmentDTO) {
         fieldAssignmentStaffService.saveAssignment(assignmentDTO);
         return ResponseEntity.ok("Assignment saved successfully");
+    }
+
+    @GetMapping(value = "allassignments", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<FieldStaffAssignmentDTO> getAllAssignments() {
+        return fieldAssignmentStaffService.getAllFieldStaffAssignments();
     }
 }

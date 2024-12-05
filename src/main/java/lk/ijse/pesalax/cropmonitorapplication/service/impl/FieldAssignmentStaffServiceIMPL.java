@@ -8,9 +8,12 @@ import lk.ijse.pesalax.cropmonitorapplication.entity.impl.Field;
 import lk.ijse.pesalax.cropmonitorapplication.entity.impl.FieldStaffAssignment;
 import lk.ijse.pesalax.cropmonitorapplication.entity.impl.Staff;
 import lk.ijse.pesalax.cropmonitorapplication.service.FieldAssignmentStaffService;
+import lk.ijse.pesalax.cropmonitorapplication.util.Mapping;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @Transactional
@@ -19,6 +22,7 @@ public class FieldAssignmentStaffServiceIMPL implements FieldAssignmentStaffServ
     private final FieldStaffAssignmentDAO fieldStaffAssignmentDAO;
     private final FieldDAO fieldDAO;
     private final StaffDAO staffDAO;
+    private final Mapping mapping;
 
     @Override
     public void saveAssignment(FieldStaffAssignmentDTO fieldStaffAssignmentDTO) {
@@ -34,5 +38,12 @@ public class FieldAssignmentStaffServiceIMPL implements FieldAssignmentStaffServ
         fieldStaffAssignment.setAssignmentDate(fieldStaffAssignmentDTO.getAssignmentDate());
 
         fieldStaffAssignmentDAO.save(fieldStaffAssignment);
-    }}
+    }
+
+    @Override
+    public List<FieldStaffAssignmentDTO> getAllFieldStaffAssignments() {
+        List<FieldStaffAssignment> logs = fieldStaffAssignmentDAO.findAll();
+        return mapping.convertToFieldStaffAssignmentDTOList(logs);
+    }
+}
 
