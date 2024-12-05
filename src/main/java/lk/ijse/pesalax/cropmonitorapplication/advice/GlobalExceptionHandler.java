@@ -1,6 +1,6 @@
 package lk.ijse.pesalax.cropmonitorapplication.advice;
 
-import lk.ijse.pesalax.cropmonitorapplication.exception.DublicateRecordException;
+import lk.ijse.pesalax.cropmonitorapplication.exception.DuplicateRecordException;
 import lk.ijse.pesalax.cropmonitorapplication.exception.NotFoundException;
 import lk.ijse.pesalax.cropmonitorapplication.exception.ServiceException;
 import org.springframework.http.HttpStatus;
@@ -18,41 +18,49 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler(ServiceException.class)
-    public ResponseEntity<Map<String,Object>> handleServiceExecption(ServiceException exp){
-        Map<String,Object> errorAttribute;
-        if(exp instanceof DublicateRecordException){
+    public ResponseEntity<Map<String, Object>> handleServiceException(ServiceException exp) {
+        Map<String, Object> errorAttribute;
+        if (exp instanceof DuplicateRecordException) {
             errorAttribute = getCommonError(HttpStatus.CONFLICT);
-        }else if(exp instanceof NotFoundException){
+        } else if (exp instanceof NotFoundException) {
             errorAttribute = getCommonError(HttpStatus.NOT_FOUND);
-        }else{
+        } else {
             errorAttribute = getCommonError(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        errorAttribute.put("message",exp.getMessage());
-        return new ResponseEntity<>(errorAttribute,HttpStatus.valueOf((Integer) errorAttribute.get("code")));
+        errorAttribute.put("message", exp.getMessage());
+        return new ResponseEntity<>(errorAttribute, HttpStatus.valueOf((Integer) errorAttribute.get("code")));
     }
+
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, Object>handleDataValidationException(MethodArgumentNotValidException exp){
+    public Map<String, Object> handleDataValidationException(MethodArgumentNotValidException exp) {
         Map<String, Object> errorAttribute = getCommonError(HttpStatus.BAD_REQUEST);
-        ArrayList<Map<String,Object>> errorList = new ArrayList<>();
+        ArrayList<Map<String, Object>> errorList = new ArrayList<>();
         for (FieldError fieldError : exp.getFieldErrors()) {
-            LinkedHashMap<String,Object> errorMap=new LinkedHashMap<>();
-            errorMap.put("failed",fieldError.getField());
-            errorMap.put("message",fieldError.getDefaultMessage());
-            errorMap.put("rejected",fieldError.getRejectedValue());
+            LinkedHashMap<String, Object> errorMap = new LinkedHashMap<>();
+            errorMap.put("failed", fieldError.getField());
+            errorMap.put("message", fieldError.getDefaultMessage());
+            errorMap.put("rejected", fieldError.getRejectedValue());
             errorList.add(errorMap);
         }
-        errorAttribute.put("message","Data Validation Failed...!");
-        errorAttribute.put("errors",errorList);
+        errorAttribute.put("message", "Data Validation Failed...!");
+        errorAttribute.put("errors", errorList);
 
         return errorAttribute;
     }
 
-    public Map<String,Object>getCommonError(HttpStatus status){
-        LinkedHashMap<String,Object>errorAttribute = new LinkedHashMap<>();
-        errorAttribute.put("code",status.value());
-        errorAttribute.put("status",status);
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Map<String, Object>> handleGenericException(Exception exp) {
+        Map<String, Object> errorAttribute = getCommonError(HttpStatus.INTERNAL_SERVER_ERROR);
+        errorAttribute.put("message", "An unexpected error occurred.");
+        return new ResponseEntity<>(errorAttribute, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    public Map<String, Object> getCommonError(HttpStatus status) {
+        LinkedHashMap<String, Object> errorAttribute = new LinkedHashMap<>();
+        errorAttribute.put("code", status.value());
+        errorAttribute.put("status", status);
 
         return errorAttribute;
     }
