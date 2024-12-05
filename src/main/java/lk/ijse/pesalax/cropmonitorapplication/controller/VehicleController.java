@@ -25,14 +25,18 @@ public class VehicleController {
     @PreAuthorize("hasAnyRole('MANAGER', 'ADMINISTRATIVE')")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> saveVehicle(@RequestBody VehicleDTO vehicleDTO) {
-        try {
-            vehicleService.saveVehicle(vehicleDTO);
-            return new ResponseEntity<>("Vehicle saved successfully", HttpStatus.CREATED);
-        } catch (DataPersistException e) {
-            return new ResponseEntity<>("Failed to save vehicle: " + e.getMessage(), HttpStatus.BAD_REQUEST);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity<>("Internal server error", HttpStatus.INTERNAL_SERVER_ERROR);
+        if (vehicleDTO == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        } else {
+            try {
+                vehicleService.saveVehicle(vehicleDTO);
+                return new ResponseEntity<>(HttpStatus.CREATED);
+            } catch (DataPersistException e) {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
         }
     }
 
