@@ -13,6 +13,9 @@ $(document).ready(function () {
     $.ajax({
       url: "http://localhost:5050/crop-monitor/api/v1/vehicles/allVehicles",
       method: "GET",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
       success: function (vehicles) {
         $("#vehicleList")
           .empty()
@@ -60,18 +63,33 @@ $(document).ready(function () {
       type: "POST",
       contentType: "application/json",
       data: JSON.stringify(staffData),
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
       success: function () {
         alert("Staff saved successfully!");
         $("#staffForm")[0].reset();
         generateStaffID();
       },
+
       error: function (xhr) {
-        alert("Error saving staff: " + xhr.responseText);
+        if (xhr.status === 401) {
+          // Handle session expiration
+          if (confirm("Session expired. Please log in again.")) {
+            window.location.href = "/index.html";
+          }
+        } else if (xhr.status === 403) {
+          // Handle insufficient permissions
+          alert("You do not have permission to perform this action.");
+        } else {
+          // Handle other errors
+          alert("Error saving staff: " + (xhr.responseText || "An unexpected error occurred."));
+        }
       },
     });
   });
 
-  // search staff
+  // search satff member
   $("#searchIcon").on("click", function () {
     searchAndFillStaffForm();
   });
@@ -94,6 +112,9 @@ $(document).ready(function () {
         searchTerm
       )}`,
       type: "GET",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
       success: function (staffList) {
         if (staffList.length === 0) {
           alert("No matching staff found.");
@@ -120,8 +141,17 @@ $(document).ready(function () {
         $("#address5").val(staff.addressLine05);
         $("#vehicleList").val(staff.vehicleCode).change();
       },
+
       error: function (xhr) {
-        alert("Error retrieving staff data: " + xhr.responseText);
+        if (xhr.status === 401)
+          // Handle session expiration
+          if (confirm("Session expired. Please log in again.")) {
+            window.location.href = "/index.html";
+          }
+        else {
+          // Handle other errors
+          alert("Error searching staff: " + (xhr.responseText || "An unexpected error occurred."));
+        }
       },
     });
   }
@@ -152,11 +182,26 @@ $(document).ready(function () {
       type: "PATCH",
       contentType: "application/json",
       data: JSON.stringify(staffData),
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
       success: function () {
         alert("Staff updated successfully!");
       },
-      error: function () {
-        alert("Error updating staff.");
+
+      error: function (xhr) {
+        if (xhr.status === 401) {
+          // Handle session expiration
+          if (confirm("Session expired. Please log in again.")) {
+            window.location.href = "/index.html";
+          }
+        } else if (xhr.status === 403) {
+          // Handle insufficient permissions
+          alert("You do not have permission to perform this action.");
+        } else {
+          // Handle other errors
+          alert("Error updating staff: " + (xhr.responseText || "An unexpected error occurred."));
+        }
       },
     });
   });
@@ -168,13 +213,28 @@ $(document).ready(function () {
       $.ajax({
         url: `http://localhost:5050/crop-monitor/api/v1/staff/${staffId}`,
         type: "DELETE",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
         success: function () {
           alert("Staff deleted successfully!");
           $("#staffForm")[0].reset();
           generateStaffID();
         },
-        error: function () {
-          alert("Error deleting staff.");
+
+        error: function (xhr) {
+          if (xhr.status === 401) {
+            // Handle session expiration
+            if (confirm("Session expired. Please log in again.")) {
+              window.location.href = "/index.html";
+            }
+          } else if (xhr.status === 403) {
+            // Handle insufficient permissions
+            alert("You do not have permission to perform this action.");
+          } else {
+            // Handle other errors
+            alert("Error deleting staff: " + (xhr.responseText || "An unexpected error occurred."));
+          }
         },
       });
     }
@@ -185,57 +245,67 @@ $(document).ready(function () {
     $("#staffForm")[0].reset();
     generateStaffID();
   });
+});
 
+// getAll staff
+$("#getAllBtn").click(function () {
+  console.log("Fetching all staff...");
+  $.ajax({
+    url: "http://localhost:5050/crop-monitor/api/v1/staff/allstaff",
+    type: "GET",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+    },
+    success: function (staffList) {
+      console.log("Staff data received:", staffList);
 
-  $("#getAllBtn").click(function () {
-    console.log("Fetching all staff...");
-    $.ajax({
-      url: "http://localhost:5050/crop-monitor/api/v1/staff/allstaff",
-      type: "GET",
-      success: function (staffList) {
-        console.log("Staff data received:", staffList);
+      let staffRows1 = "";
+      let staffRows2 = "";
 
-        let staffRows1 = "";
-        let staffRows2 = "";
+      staffList.forEach((staff) => {
+        staffRows1 += `
+          <tr>
+            <td>${staff.id}</td>
+            <td>${staff.firstName}</td>
+            <td>${staff.lastName}</td>
+            <td>${staff.designation}</td>
+            <td>${staff.gender}</td>
+            <td>${new Date(staff.joinedDate).toLocaleDateString()}</td>
+            <td>${new Date(staff.dob).toLocaleDateString()}</td>
+            <td>${staff.role}</td>
+          </tr>
+        `;
 
-        staffList.forEach((staff) => {
-          staffRows1 += `
-            <tr>
-              <td>${staff.id}</td>
-              <td>${staff.firstName}</td>
-              <td>${staff.lastName}</td>
-              <td>${staff.designation}</td>
-              <td>${staff.gender}</td>
-              <td>${new Date(staff.joinedDate).toLocaleDateString()}</td>
-              <td>${new Date(staff.dob).toLocaleDateString()}</td>
-              <td>${staff.role}</td>
-            </tr>
-          `;
+        staffRows2 += `
+          <tr>
+            <td>${staff.addressLine01 || "N/A"}</td>
+            <td>${staff.addressLine02 || "N/A"}</td>
+            <td>${staff.addressLine03 || "N/A"}</td>
+            <td>${staff.addressLine04 || "N/A"}</td>
+            <td>${staff.addressLine05 || "N/A"}</td>
+            <td>${staff.contactNo}</td>
+            <td>${staff.email}</td>
+            <td>${staff.vehicleCode}</td>
+          </tr>
+        `;
+      });
 
-          staffRows2 += `
-            <tr>
-              <td>${staff.addressLine01 || "N/A"}</td>
-              <td>${staff.addressLine02 || "N/A"}</td>
-              <td>${staff.addressLine03 || "N/A"}</td>
-              <td>${staff.addressLine04 || "N/A"}</td>
-              <td>${staff.addressLine05 || "N/A"}</td>
-              <td>${staff.contactNo}</td>
-              <td>${staff.email}</td>
-              td>${staff.vehicleCode}</td>
-            </tr>
-          `;
-        });
+      $("#staffTableBody1").html(staffRows1);
+      $("#staffTableBody2").html(staffRows2);
 
-        $("#staffTableBody1").html(staffRows1);
-        $("#staffTableBody2").html(staffRows2);
+      $("#staffListModal").modal("show");
+    },
 
-        $("#staffListModal").modal("show");
-      },
-      error: function (xhr) {
-        console.error("Failed to fetch staff data:", xhr.responseText);
-        alert("Failed to fetch staff data.");
-      },
-    });
+    error: function (xhr) {
+      if (xhr.status === 401)
+        // Handle session expiration
+        if (confirm("Session expired. Please log in again.")) {
+          window.location.href = "/index.html";
+        }
+      else {
+        // Handle other errors
+        alert("Error to fetch staff data: " + (xhr.responseText || "An unexpected error occurred."));
+      }
+    },
   });
-
 });
