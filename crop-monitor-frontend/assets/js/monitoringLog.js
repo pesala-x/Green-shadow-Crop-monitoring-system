@@ -15,6 +15,9 @@ $(document).ready(function () {
     $.ajax({
       url: "http://localhost:5050/crop-monitor/api/v1/fields/allFields",
       method: "GET",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
       success: function (fields) {
         $("#fieldSelect")
           .empty()
@@ -39,6 +42,9 @@ $(document).ready(function () {
     $.ajax({
       url: "http://localhost:5050/crop-monitor/api/v1/crops/allcrops",
       method: "GET",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
       success: function (crops) {
         $("#cropSelect")
           .empty()
@@ -63,6 +69,9 @@ $(document).ready(function () {
     $.ajax({
       url: "http://localhost:5050/crop-monitor/api/v1/staff/allstaff",
       method: "GET",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
       success: function (staffList) {
         $("#staffSelect")
           .empty()
@@ -97,13 +106,28 @@ $(document).ready(function () {
       data: formData,
       contentType: false,
       processData: false,
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
       success: function () {
         alert("Monitoring log saved successfully!");
         $("#monitoringLogForm")[0].reset();
         generateLogCode();
       },
-      error: function () {
-        alert("Error saving monitoring log.");
+
+      error: function (xhr) {
+        if (xhr.status === 401) {
+          // Handle session expiration
+          if (confirm("Session expired. Please log in again.")) {
+            window.location.href = "/index.html";
+          }
+        } else if (xhr.status === 403) {
+          // Handle insufficient permissions
+          alert("You do not have permission to perform this action.");
+        } else {
+          // Handle other errors
+          alert("Error saving monitoring log: " + (xhr.responseText || "An unexpected error occurred."));
+        }
       },
     });
   });
@@ -113,6 +137,9 @@ $(document).ready(function () {
     $.ajax({
       url: "http://localhost:5050/crop-monitor/api/v1/monitoringLog/allLogs",
       type: "GET",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
       success: function (logs) {
         let tableBody = $("#logTableBody");
         tableBody.empty();
@@ -131,8 +158,17 @@ $(document).ready(function () {
         });
         $("#logListModal").modal("show");
       },
-      error: function () {
-        alert("Error retrieving monitoring logs.");
+
+      error: function (xhr) {
+        if (xhr.status === 401)
+          // Handle session expiration
+          if (confirm("Session expired. Please log in again.")) {
+            window.location.href = "/index.html";
+          }
+        else {
+          // Handle other errors
+          alert("Error retrieving monitoring logs : " + (xhr.responseText || "An unexpected error occurred."));
+        }
       },
     });
   });
@@ -155,6 +191,9 @@ $(document).ready(function () {
         searchTerm
       )}`,
       type: "GET",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
       success: function (logs) {
         if (logs.length === 0) {
           alert("No matching log found.");
@@ -177,8 +216,17 @@ $(document).ready(function () {
           $("#previewObservedImage").hide();
         }
       },
-      error: function () {
-        alert("Error retrieving monitoring log.");
+
+      error: function (xhr) {
+        if (xhr.status === 401)
+          // Handle session expiration
+          if (confirm("Session expired. Please log in again.")) {
+            window.location.href = "/index.html";
+          }
+        else {
+          // Handle other errors
+          alert("Error retrieving monitoring log : " + (xhr.responseText || "An unexpected error occurred."));
+        }
       },
     });
   }
@@ -192,7 +240,7 @@ $(document).ready(function () {
     formData.append("cropCode", $("#cropSelect").val());
     formData.append("staffId", $("#staffSelect").val());
     if ($("#observedImage")[0].files[0]) {
-      formData.append("observedImage", $("#observedImage")[0].files[0]);
+      formData.append("logImage", $("#observedImage")[0].files[0]);
     }
 
     $.ajax({
@@ -203,11 +251,26 @@ $(document).ready(function () {
       data: formData,
       contentType: false,
       processData: false,
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
       success: function () {
         alert("Monitoring log updated successfully!");
       },
-      error: function () {
-        alert("Error updating monitoring log.");
+
+      error: function (xhr) {
+        if (xhr.status === 401) {
+          // Handle session expiration
+          if (confirm("Session expired. Please log in again.")) {
+            window.location.href = "/index.html";
+          }
+        } else if (xhr.status === 403) {
+          // Handle insufficient permissions
+          alert("You do not have permission to perform this action.");
+        } else {
+          // Handle other errors
+          alert("Error updating monitoring log : " + (xhr.responseText || "An unexpected error occurred."));
+        }
       },
     });
   });
@@ -219,13 +282,28 @@ $(document).ready(function () {
       $.ajax({
         url: `http://localhost:5050/crop-monitor/api/v1/monitoringLog/${logCode}`,
         type: "DELETE",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
         success: function () {
           alert("Monitoring log deleted successfully!");
           $("#logForm")[0].reset();
           generateLogCode();
         },
-        error: function () {
-          alert("Error deleting monitoring log.");
+
+        error: function (xhr) {
+          if (xhr.status === 401) {
+            // Handle session expiration
+            if (confirm("Session expired. Please log in again.")) {
+              window.location.href = "/index.html";
+            }
+          } else if (xhr.status === 403) {
+            // Handle insufficient permissions
+            alert("You do not have permission to perform this action.");
+          } else {
+            // Handle other errors
+            alert("Error delete monitoring log: " + (xhr.responseText || "An unexpected error occurred."));
+          }
         },
       });
     }
