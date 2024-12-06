@@ -39,7 +39,7 @@ public class StaffServiceIMPL implements StaffService {
             }
 
             staff.setVehicle(vehicle);
-            vehicle.setStatus("out of service");
+            vehicle.setStatus("out_of_service");
             vehicleDAO.save(vehicle);
         } else {
             staff.setVehicle(null); // No vehicle assigned
@@ -118,7 +118,7 @@ public class StaffServiceIMPL implements StaffService {
                     .orElseThrow(() -> new DataPersistException("Invalid Vehicle code"));
 
             // Update the vehicle status
-            vehicle.setStatus("out of service");
+            vehicle.setStatus("out_of_service");
             vehicleDAO.save(vehicle);
             existingStaff.setVehicle(vehicle);
         } else {

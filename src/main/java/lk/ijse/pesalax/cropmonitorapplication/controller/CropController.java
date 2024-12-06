@@ -8,6 +8,8 @@ import lk.ijse.pesalax.cropmonitorapplication.exception.DataPersistException;
 import lk.ijse.pesalax.cropmonitorapplication.service.CropService;
 import lk.ijse.pesalax.cropmonitorapplication.util.AppUtil;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +26,7 @@ import java.util.List;
 public class CropController {
 
     private final CropService cropService;
+    private static final Logger logger = LoggerFactory.getLogger(CropController.class);
     @PreAuthorize("hasAnyRole('MANAGER', 'SCIENTIST')")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> saveCrop(
@@ -37,9 +40,13 @@ public class CropController {
             HttpServletRequest request
 
     ) {
-        System.out.println("Content-Type: " + request.getContentType());
+        logger.info("Processing crop save request: cropCode={}, cropCommonName={}, category={}",
+                cropCode, cropCommonName, category);
+        logger.debug("Content-Type: {}", request.getContentType());
+
         request.getHeaderNames().asIterator().forEachRemaining(header ->
-                System.out.println(header + ": " + request.getHeader(header)));
+                logger.debug("{}: {}", header, request.getHeader(header))
+        );
 
         try {
             byte[] byteFieldImage1 = cropImage.getBytes();
@@ -55,15 +62,17 @@ public class CropController {
             cropDTO.setFieldCode(fieldCode);
 
             cropService.saveCrop(cropDTO);
+            logger.info("Crop saved successfully!");
 
             return new ResponseEntity<>(new FieldErrorResponse(0,
                     "Crop saved successfully"), HttpStatus.CREATED);
 
         } catch (DataPersistException e) {
+            logger.error("Error saving crop: {}", e.getMessage(), e);
             return new ResponseEntity<>(new FieldErrorResponse(0,
                     "Can't save: " + e.getMessage()), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Unexpected error while saving crop", e);
             return new ResponseEntity<>(new FieldErrorResponse(0,
                     "Internal server error"), HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -71,24 +80,37 @@ public class CropController {
 
     @GetMapping(value = "allcrops", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<CropDTO> getAllCrops() {
+        logger.info("Fetching all crops.");
         return cropService.getAllCrops();
     }
 
     @GetMapping()
     public ResponseEntity<List<CropDTO>> searchCrops(@RequestParam("searchTerm") String searchTerm) {
-        List<CropDTO> crops = cropService.searchCrops(searchTerm);
-        return new ResponseEntity<>(crops, HttpStatus.OK);
+        logger.info("Searching crops with term: {}", searchTerm);
+
+        try {
+            List<CropDTO> crops = cropService.searchCrops(searchTerm);
+            logger.info("Found {} crops matching the search term.", crops.size());
+            return new ResponseEntity<>(crops, HttpStatus.OK);
+        } catch (Exception e) {
+            logger.error("Error searching crops with term: {}", searchTerm, e);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @PreAuthorize("hasAnyRole('MANAGER', 'SCIENTIST')")
     @DeleteMapping(value = "/{code}")
     public ResponseEntity<Void> deleteSelectedCrop(@PathVariable("code") String code) {
+        logger.info("Attempting to delete crop with code: {}", code);
         try {
             cropService.deleteCrop(code);
+            logger.info("Successfully deleted crop with code: {}", code);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } catch (CropNotFoundException e) {
+            logger.warn("Crop not found: {}", code);
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (Exception e) {
+            logger.error("Unexpected error while deleting crop with code: {}", code, e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -104,6 +126,7 @@ public class CropController {
             @RequestParam(value = "cropImage", required = false) MultipartFile cropImage,
             @RequestParam(value = "fieldCode", required = false) String fieldCode
     ) {
+        logger.info("Updating crop with code: {}", cropCode);
         try {
             CropDTO cropDTO = new CropDTO();
 
@@ -117,12 +140,11 @@ public class CropController {
             }
 
             if (fieldCode != null) cropDTO.setFieldCode(fieldCode);
-
             cropService.updateCrop(cropCode, cropDTO);
-
+            logger.info("Successfully updated crop with code: {}", cropCode);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error updating crop with code: {}", cropCode, e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
