@@ -88,9 +88,90 @@ $(document).ready(function () {
     });
   }
 
+  // Utility function to check if the first letter is capitalized
+  function isFirstLetterCapitalized(text) {
+    return /^[A-Z]/.test(text);
+  }
+
+  // Function to validate Monitoring Log inputs with SweetAlert popups
+  function validateMonitoringLogInputs() {
+    const logDateInput = $("#logDate");
+    const logDetailsInput = $("#logDetails");
+    const fieldSelectInput = $("#fieldSelect");
+    const cropSelectInput = $("#cropSelect");
+    const staffSelectInput = $("#staffSelect");
+
+    const logDate = logDateInput.val();
+    const logDetails = logDetailsInput.val().trim();
+    const field = fieldSelectInput.val();
+    const crop = cropSelectInput.val();
+    const staff = staffSelectInput.val();
+
+    if (!logDate) {
+      showValidationError("Invalid Input", "Log Date cannot be empty.");
+      return false;
+    }
+
+    if (!logDetails) {
+      showValidationError("Invalid Input", "Log Details cannot be empty.");
+      return false;
+    }
+    if (!isFirstLetterCapitalized(logDetails)) {
+      showValidationError(
+        "Invalid Input",
+        "Log Details must start with a capital letter."
+      );
+      return false;
+    }
+
+    if (!field) {
+      showValidationError("Invalid Input", "Please select a field.");
+      return false;
+    }
+
+    if (!crop) {
+      showValidationError("Invalid Input", "Please select a crop.");
+      return false;
+    }
+
+    if (!staff) {
+      showValidationError("Invalid Input", "Please select a staff member.");
+      return false;
+    }
+
+    return true;
+  }
+
+  function showValidationError(title, text) {
+    Swal.fire({
+      icon: "error",
+      title: title,
+      text: text,
+      footer: '<a href="">Why do I have this issue?</a>',
+    });
+  }
+
+  function showPopup(type, title, text, confirmCallback = null) {
+    Swal.fire({
+      icon: type,
+      title: title,
+      text: text,
+      showCancelButton: !!confirmCallback,
+      confirmButtonText: "OK",
+      cancelButtonText: "Cancel",
+    }).then((result) => {
+      if (result.isConfirmed && confirmCallback) {
+        confirmCallback();
+      }
+    });
+  }
+
   // Save Monitoring Log
   $("#monitoringLogForm").on("submit", function (e) {
     e.preventDefault();
+    if (!validateMonitoringLogInputs()) {
+      return;
+    }
     let formData = new FormData(this);
     formData.append("logCode", $("#logCode").val());
     formData.append("logDate", $("#logDate").val());
@@ -110,23 +191,37 @@ $(document).ready(function () {
         Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
       },
       success: function () {
-        alert("Monitoring log saved successfully!");
+        Swal.fire(
+          "Save Successfully!",
+          "Monitoring log has been saved successfully.",
+          "success"
+        );
         $("#monitoringLogForm")[0].reset();
         generateLogCode();
       },
 
       error: function (xhr) {
         if (xhr.status === 401) {
-          // Handle session expiration
-          if (confirm("Session expired. Please log in again.")) {
-            window.location.href = "/index.html";
-          }
+          showPopup(
+            "warning",
+            "Session Expired",
+            "Your session has expired. Please log in again.",
+            () => {
+              window.location.href = "/index.html";
+            }
+          );
         } else if (xhr.status === 403) {
-          // Handle insufficient permissions
-          alert("You do not have permission to perform this action.");
+          showPopup(
+            "error",
+            "Permission Denied",
+            "You do not have permission to perform this action."
+          );
         } else {
-          // Handle other errors
-          alert("Error saving monitoring log: " + (xhr.responseText || "An unexpected error occurred."));
+          showPopup(
+            "error",
+            "Error",
+            xhr.responseText || "An unexpected error occurred."
+          );
         }
       },
     });
@@ -160,14 +255,21 @@ $(document).ready(function () {
       },
 
       error: function (xhr) {
-        if (xhr.status === 401)
-          // Handle session expiration
-          if (confirm("Session expired. Please log in again.")) {
-            window.location.href = "/index.html";
-          }
-        else {
-          // Handle other errors
-          alert("Error retrieving monitoring logs : " + (xhr.responseText || "An unexpected error occurred."));
+        if (xhr.status === 401) {
+          showPopup(
+            "warning",
+            "Session Expired",
+            "Your session has expired. Please log in again.",
+            () => {
+              window.location.href = "/index.html";
+            }
+          );
+        } else {
+          showPopup(
+            "error",
+            "Error",
+            xhr.responseText || "An unexpected error occurred."
+          );
         }
       },
     });
@@ -182,7 +284,7 @@ $(document).ready(function () {
   function searchAndFillLogForm() {
     const searchTerm = $("#searchLog").val().trim();
     if (searchTerm === "") {
-      alert("Enter log code or observation.");
+      showPopup("warning", "Not Found", "Please enter a log code or date ");
       return;
     }
 
@@ -196,7 +298,11 @@ $(document).ready(function () {
       },
       success: function (logs) {
         if (logs.length === 0) {
-          alert("No matching log found.");
+          showPopup(
+            "warning",
+            "Not Found",
+            "Log not found. Please try again!. "
+          );
           return;
         }
 
@@ -218,14 +324,21 @@ $(document).ready(function () {
       },
 
       error: function (xhr) {
-        if (xhr.status === 401)
-          // Handle session expiration
-          if (confirm("Session expired. Please log in again.")) {
-            window.location.href = "/index.html";
-          }
-        else {
-          // Handle other errors
-          alert("Error retrieving monitoring log : " + (xhr.responseText || "An unexpected error occurred."));
+        if (xhr.status === 401) {
+          showPopup(
+            "warning",
+            "Session Expired",
+            "Your session has expired. Please log in again.",
+            () => {
+              window.location.href = "/index.html";
+            }
+          );
+        } else {
+          showPopup(
+            "error",
+            "Error",
+            xhr.responseText || "An unexpected error occurred."
+          );
         }
       },
     });
@@ -233,6 +346,9 @@ $(document).ready(function () {
 
   // Update Monitoring Log
   $("#updateLogBtn").on("click", function () {
+    if (!validateMonitoringLogInputs()) {
+      return;
+    }
     let formData = new FormData();
     formData.append("logDate", $("#logDate").val());
     formData.append("observation", $("#logDetails").val());
@@ -255,21 +371,35 @@ $(document).ready(function () {
         Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
       },
       success: function () {
-        alert("Monitoring log updated successfully!");
+        Swal.fire(
+          "Update Successfully!",
+          "Monitoring log has been updated successfully.",
+          "success"
+        );
       },
 
       error: function (xhr) {
         if (xhr.status === 401) {
-          // Handle session expiration
-          if (confirm("Session expired. Please log in again.")) {
-            window.location.href = "/index.html";
-          }
+          showPopup(
+            "warning",
+            "Session Expired",
+            "Your session has expired. Please log in again.",
+            () => {
+              window.location.href = "/index.html";
+            }
+          );
         } else if (xhr.status === 403) {
-          // Handle insufficient permissions
-          alert("You do not have permission to perform this action.");
+          showPopup(
+            "error",
+            "Permission Denied",
+            "You do not have permission to perform this action."
+          );
         } else {
-          // Handle other errors
-          alert("Error updating monitoring log : " + (xhr.responseText || "An unexpected error occurred."));
+          showPopup(
+            "error",
+            "Error",
+            xhr.responseText || "An unexpected error occurred."
+          );
         }
       },
     });
@@ -278,35 +408,54 @@ $(document).ready(function () {
   // Delete Monitoring Log
   $("#deleteLogBtn").on("click", function () {
     const logCode = $("#logCode").val();
-    if (confirm("Are you sure you want to delete this log?")) {
-      $.ajax({
-        url: `http://localhost:5050/crop-monitor/api/v1/monitoringLog/${logCode}`,
-        type: "DELETE",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-        },
-        success: function () {
-          alert("Monitoring log deleted successfully!");
-          $("#logForm")[0].reset();
-          generateLogCode();
-        },
+    showPopup(
+      "warning",
+      "Confirm Delete",
+      "Are you sure you want to delete this Monitoring Log?",
+      () => {
+        $.ajax({
+          url: `http://localhost:5050/crop-monitor/api/v1/monitoringLog/${logCode}`,
+          type: "DELETE",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+          success: function () {
+            Swal.fire(
+              "Delete Successfully!",
+              "Monitoring Log has been deleted successfully.",
+              "success"
+            );
+            $("#logForm")[0].reset();
+            generateLogCode();
+          },
 
-        error: function (xhr) {
-          if (xhr.status === 401) {
-            // Handle session expiration
-            if (confirm("Session expired. Please log in again.")) {
-              window.location.href = "/index.html";
+          error: function (xhr) {
+            if (xhr.status === 401) {
+              showPopup(
+                "warning",
+                "Session Expired",
+                "Your session has expired. Please log in again.",
+                () => {
+                  window.location.href = "/index.html";
+                }
+              );
+            } else if (xhr.status === 403) {
+              showPopup(
+                "error",
+                "Permission Denied",
+                "You do not have permission to perform this action."
+              );
+            } else {
+              showPopup(
+                "error",
+                "Error",
+                xhr.responseText || "An unexpected error occurred."
+              );
             }
-          } else if (xhr.status === 403) {
-            // Handle insufficient permissions
-            alert("You do not have permission to perform this action.");
-          } else {
-            // Handle other errors
-            alert("Error delete monitoring log: " + (xhr.responseText || "An unexpected error occurred."));
-          }
-        },
-      });
-    }
+          },
+        });
+      }
+    );
   });
 
   // Clear Monitoring Log Form
