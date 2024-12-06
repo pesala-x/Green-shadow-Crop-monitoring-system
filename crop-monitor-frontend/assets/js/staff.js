@@ -38,9 +38,156 @@ $(document).ready(function () {
     });
   }
 
+  function isFirstLetterCapitalized(text) {
+    return /^[A-Z]/.test(text);
+  }
+
+  // Function to validate inputs with SweetAlert popups
+  function validateStaffInputs() {
+    const firstNameInput = $("#firstName");
+    const lastNameInput = $("#lastName");
+    const designationInput = $("#designation");
+    const genderInput = $("#gender");
+    const joinedDateInput = $("#joinedDate");
+    const dobInput = $("#dob");
+    const contactNoInput = $("#contactNo");
+    const emailInput = $("#email");
+    const addressLine01Input = $("#address1");
+    const addressLine02Input = $("#address2");
+    const addressLine03Input = $("#address3");
+    const addressLine04Input = $("#address4");
+    const addressLine05Input = $("#address5");
+    const roleInput = $("#role");
+    const vehicleListInput = $("#vehicleList");
+
+    const firstName = firstNameInput.val().trim();
+    const lastName = lastNameInput.val().trim();
+    const designation = designationInput.val();
+    const gender = genderInput.val();
+    const joinedDate = joinedDateInput.val();
+    const dob = dobInput.val();
+    const contactNo = contactNoInput.val().trim();
+    const email = emailInput.val().trim();
+    const addressLine01 = addressLine01Input.val().trim();
+    const addressLine02 = addressLine02Input.val().trim();
+    const addressLine03 = addressLine03Input.val().trim();
+    const addressLine04 = addressLine04Input.val().trim();
+    const addressLine05 = addressLine05Input.val().trim();
+    const role = roleInput.val();
+    const vehicleCode = vehicleListInput.val();
+
+    if (!isFirstLetterCapitalized(firstName)) {
+      showValidationError(
+        "Invalid Input",
+        "Staff First Name must start with a capital letter."
+      );
+      return false;
+    }
+
+    if (!isFirstLetterCapitalized(lastName)) {
+      showValidationError(
+        "Invalid Input",
+        "Staff Last name must start with a capital letter."
+      );
+      return false;
+    }
+
+    if (!gender) {
+      showValidationError("Invalid Input", "Please select a gender.");
+      return false;
+    }
+
+    if (!joinedDate) {
+      showValidationError("Invalid Input", "Please select a joined date.");
+      return false;
+    }
+
+    if (!dob) {
+      showValidationError("Invalid Input", "Please select a date of birth.");
+      return false;
+    }
+
+    if (!/^\d{10}$/.test(contactNo)) {
+      showValidationError(
+        "Invalid Input",
+        "Contact number must be 10 digits (e.g., 0771234567)."
+      );
+      return false;
+    }
+
+    if (!/^\S+@\S+\.\S+$/.test(email)) {
+      showValidationError(
+        "Invalid Input",
+        "Please enter a valid email address."
+      );
+      return false;
+    }
+
+    if (!addressLine01) {
+      showValidationError("Not Empty", "Please input address line 01.");
+      return false;
+    }
+    if (!addressLine02) {
+      showValidationError("Not Empty", "Please input address line 02.");
+      return false;
+    }
+    if (!addressLine03) {
+      showValidationError("Not Empty", "Please input city.");
+      return false;
+    }
+    if (!addressLine04) {
+      showValidationError("Not Empty", "Please input state.");
+      return false;
+    }
+    if (!addressLine05) {
+      showValidationError("Not Empty", "Please input postal code.");
+      return false;
+    }
+
+    if (!role) {
+      showValidationError("Invalid Input", "Please select a role.");
+      return false;
+    }
+
+    if (!vehicleCode) {
+      showValidationError("Invalid Input", "Please select a vehicle.");
+      return false;
+    }
+
+    return true;
+  }
+
+  function showValidationError(title, text) {
+    Swal.fire({
+      icon: "error",
+      title: title,
+      text: text,
+      footer: '<a href="">Why do I have this issue?</a>',
+    });
+  }
+
+  function showPopup(type, title, text, confirmCallback = null) {
+    Swal.fire({
+      icon: type,
+      title: title,
+      text: text,
+      showCancelButton: !!confirmCallback,
+      confirmButtonText: "OK",
+      cancelButtonText: "Cancel",
+    }).then((result) => {
+      if (result.isConfirmed && confirmCallback) {
+        confirmCallback();
+      }
+    });
+  }
+
   // Save Staff
   $("#staffForm").on("submit", function (e) {
     e.preventDefault();
+
+    if (!validateStaffInputs()) {
+      return;
+    }
 
     const staffData = {
       id: $("#staffId").val(),
@@ -70,23 +217,37 @@ $(document).ready(function () {
         Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
       },
       success: function () {
-        alert("Staff saved successfully!");
+        Swal.fire(
+          "Save Successfully!",
+          "Staff has been saved successfully.",
+          "success"
+        );
         $("#staffForm")[0].reset();
         generateStaffID();
       },
 
       error: function (xhr) {
         if (xhr.status === 401) {
-          // Handle session expiration
-          if (confirm("Session expired. Please log in again.")) {
-            window.location.href = "/index.html";
-          }
+          showPopup(
+            "warning",
+            "Session Expired",
+            "Your session has expired. Please log in again.",
+            () => {
+              window.location.href = "/index.html";
+            }
+          );
         } else if (xhr.status === 403) {
-          // Handle insufficient permissions
-          alert("You do not have permission to perform this action.");
+          showPopup(
+            "error",
+            "Permission Denied",
+            "You do not have permission to perform this action."
+          );
         } else {
-          // Handle other errors
-          alert("Error saving staff: " + (xhr.responseText || "An unexpected error occurred."));
+          showPopup(
+            "error",
+            "Error",
+            xhr.responseText || "An unexpected error occurred."
+          );
         }
       },
     });
@@ -106,7 +267,11 @@ $(document).ready(function () {
   function searchAndFillStaffForm() {
     const searchTerm = $("#searchStaff").val().trim();
     if (searchTerm === "") {
-      alert("Please enter a staff ID or name.");
+      showPopup(
+        "warning",
+        "Not Found",
+        "Please enter a staff code ID name to search."
+      );
       return;
     }
 
@@ -120,7 +285,11 @@ $(document).ready(function () {
       },
       success: function (staffList) {
         if (staffList.length === 0) {
-          alert("No matching staff found.");
+          showPopup(
+            "error",
+            "Not Found",
+            "Staff not found. Please try again!."
+          );
           return;
         }
 
@@ -149,18 +318,24 @@ $(document).ready(function () {
         } else {
           $("#vehicleList").val(staff.vehicleCode).change();
         }
-
       },
 
       error: function (xhr) {
-        if (xhr.status === 401)
-          // Handle session expiration
-          if (confirm("Session expired. Please log in again.")) {
-            window.location.href = "/index.html";
-          }
-        else {
-          // Handle other errors
-          alert("Error searching staff: " + (xhr.responseText || "An unexpected error occurred."));
+        if (xhr.status === 401) {
+          showPopup(
+            "warning",
+            "Session Expired",
+            "Your session has expired. Please log in again.",
+            () => {
+              window.location.href = "/index.html";
+            }
+          );
+        } else {
+          showPopup(
+            "error",
+            "Error",
+            xhr.responseText || "An unexpected error occurred."
+          );
         }
       },
     });
@@ -168,6 +343,9 @@ $(document).ready(function () {
 
   // Update Staff
   $("#updateStaffBtn").on("click", function () {
+    if (!validateStaffInputs()) {
+      return;
+    }
     const staffId = $("#staffId").val();
     const staffData = {
       firstName: $("#firstName").val(),
@@ -196,21 +374,35 @@ $(document).ready(function () {
         Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
       },
       success: function () {
-        alert("Staff updated successfully!");
+        Swal.fire(
+          "Update Successfully!",
+          "Staff has been updated successfully.",
+          "success"
+        );
       },
 
       error: function (xhr) {
         if (xhr.status === 401) {
-          // Handle session expiration
-          if (confirm("Session expired. Please log in again.")) {
-            window.location.href = "/index.html";
-          }
+          showPopup(
+            "warning",
+            "Session Expired",
+            "Your session has expired. Please log in again.",
+            () => {
+              window.location.href = "/index.html";
+            }
+          );
         } else if (xhr.status === 403) {
-          // Handle insufficient permissions
-          alert("You do not have permission to perform this action.");
+          showPopup(
+            "error",
+            "Permission Denied",
+            "You do not have permission to perform this action."
+          );
         } else {
-          // Handle other errors
-          alert("Error updating staff: " + (xhr.responseText || "An unexpected error occurred."));
+          showPopup(
+            "error",
+            "Error",
+            xhr.responseText || "An unexpected error occurred."
+          );
         }
       },
     });
@@ -219,35 +411,54 @@ $(document).ready(function () {
   // Delete Staff
   $("#deleteStaffBtn").on("click", function () {
     const staffId = $("#staffId").val();
-    if (confirm("Are you sure you want to delete this staff member?")) {
-      $.ajax({
-        url: `http://localhost:5050/crop-monitor/api/v1/staff/${staffId}`,
-        type: "DELETE",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-        },
-        success: function () {
-          alert("Staff deleted successfully!");
-          $("#staffForm")[0].reset();
-          generateStaffID();
-        },
+    showPopup(
+      "warning",
+      "Confirm Delete",
+      "Are you sure you want to delete staff?",
+      () => {
+        $.ajax({
+          url: `http://localhost:5050/crop-monitor/api/v1/staff/${staffId}`,
+          type: "DELETE",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+          success: function () {
+            Swal.fire(
+              "Delete Successfully!",
+              "Staff has been deleted successfully.",
+              "success"
+            );
+            $("#staffForm")[0].reset();
+            generateStaffID();
+          },
 
-        error: function (xhr) {
-          if (xhr.status === 401) {
-            // Handle session expiration
-            if (confirm("Session expired. Please log in again.")) {
-              window.location.href = "/index.html";
+          error: function (xhr) {
+            if (xhr.status === 401) {
+              showPopup(
+                "warning",
+                "Session Expired",
+                "Your session has expired. Please log in again.",
+                () => {
+                  window.location.href = "/index.html";
+                }
+              );
+            } else if (xhr.status === 403) {
+              showPopup(
+                "error",
+                "Permission Denied",
+                "You do not have permission to perform this action."
+              );
+            } else {
+              showPopup(
+                "error",
+                "Error",
+                xhr.responseText || "An unexpected error occurred."
+              );
             }
-          } else if (xhr.status === 403) {
-            // Handle insufficient permissions
-            alert("You do not have permission to perform this action.");
-          } else {
-            // Handle other errors
-            alert("Error deleting staff: " + (xhr.responseText || "An unexpected error occurred."));
-          }
-        },
-      });
-    }
+          },
+        });
+      }
+    );
   });
 
   // Clear Staff Form
@@ -344,7 +555,11 @@ $(document).ready(function () {
               Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
             },
             success: function () {
-              alert("Vehicle returned successfully!");
+              Swal.fire(
+                "Save Successfully!",
+                "Vehicle returned successfully!",
+                "success"
+              );
 
               // Update local state and localStorage
               sessionReturnedVehicles.add(staffId);
@@ -355,7 +570,12 @@ $(document).ready(function () {
               button.closest("td").html("Not Allocated");
             },
             error: function () {
-              alert("Error while returning the vehicle. Please try again.");
+              // alert("Error while returning the vehicle. Please try again.");
+              showPopup(
+                "error",
+                "Error",
+                "Error while returning the vehicle. Please try again."
+              );
             },
           });
         });
@@ -365,13 +585,19 @@ $(document).ready(function () {
 
       error: function (xhr) {
         if (xhr.status === 401) {
-          if (confirm("Session expired. Please log in again.")) {
-            window.location.href = "/index.html";
-          }
+          showPopup(
+            "warning",
+            "Session Expired",
+            "Your session has expired. Please log in again.",
+            () => {
+              window.location.href = "/index.html";
+            }
+          );
         } else {
-          alert(
-            "Error fetching staff data: " +
-              (xhr.responseText || "An unexpected error occurred.")
+          showPopup(
+            "error",
+            "Error",
+            xhr.responseText || "An unexpected error occurred."
           );
         }
       },
