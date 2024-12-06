@@ -172,6 +172,17 @@ $("#getAllBtn").on("click", function () {
                   </tr>
               `);
       });
+      // Sort
+      if ($.fn.DataTable.isDataTable("#fieldList table")) {
+        $("#fieldList table").DataTable().destroy();
+      }
+      $("#fieldList table").DataTable({
+        paging: true,
+        searching: true,
+        ordering: true,
+        order: [[0, "asc"]],
+      });
+      $("#fieldList table").DataTable();
       $("#fieldListModal").modal("show");
     },
     error: function (xhr) {
