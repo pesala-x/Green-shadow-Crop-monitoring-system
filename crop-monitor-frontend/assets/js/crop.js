@@ -36,9 +36,107 @@ $(document).ready(function () {
     });
   }
 
+  // Utility function to check if the first letter is capitalized
+  function isFirstLetterCapitalized(text) {
+    return /^[A-Z]/.test(text);
+  }
+
+  // Function to validate inputs with SweetAlert popups
+  function validateCropInputs() {
+    const cropCommonNameInput = $("#cropCommonName");
+    const cropScientificNameInput = $("#cropScientificName");
+    const cropCategoryInput = $("#cropCategory");
+    const cropSeasonInput = $("#cropSeason");
+    const fieldInput = $("#field");
+
+    const cropCommonName = cropCommonNameInput.val().trim();
+    const cropScientificName = cropScientificNameInput.val().trim();
+    const cropCategory = cropCategoryInput.val();
+    const cropSeason = cropSeasonInput.val();
+    const field = fieldInput.val();
+
+    // Validate crop common name
+    if (!cropCommonName) {
+      showValidationError("Invalid Input", "Crop Common Name cannot be empty.");
+      return false;
+    }
+    if (!isFirstLetterCapitalized(cropCommonName)) {
+      showValidationError(
+        "Invalid Input",
+        "Crop Common Name must start with a capital letter."
+      );
+      return false;
+    }
+
+    // Validate crop scientific name
+    if (!cropScientificName) {
+      showValidationError(
+        "Invalid Input",
+        "Crop Scientific Name cannot be empty."
+      );
+      return false;
+    }
+    if (!isFirstLetterCapitalized(cropScientificName)) {
+      showValidationError(
+        "Invalid Input",
+        "Crop Scientific Name must start with a capital letter."
+      );
+      return false;
+    }
+
+    // Validate category
+    if (!cropCategory) {
+      showValidationError("Invalid Input", "Please select a category.");
+      return false;
+    }
+
+    // Validate season
+    if (!cropSeason) {
+      showValidationError("Invalid Input", "Please select a crop season.");
+      return false;
+    }
+
+    // Validate field
+    if (!field) {
+      showValidationError("Invalid Input", "Please select a field.");
+      return false;
+    }
+
+    return true;
+  }
+
+  // Show validation error using SweetAlert
+  function showValidationError(title, text) {
+    Swal.fire({
+      icon: "error",
+      title: title,
+      text: text,
+      footer: '<a href="">Why do I have this issue?</a>',
+    });
+  }
+
+  function showPopup(type, title, text, confirmCallback = null) {
+    Swal.fire({
+      icon: type,
+      title: title,
+      text: text,
+      showCancelButton: !!confirmCallback,
+      confirmButtonText: "OK",
+      cancelButtonText: "Cancel",
+    }).then((result) => {
+      if (result.isConfirmed && confirmCallback) {
+        confirmCallback();
+      }
+    });
+  }
+
   // Save Crop
   $("#cropForm").on("submit", function (e) {
     e.preventDefault();
+
+    if (!validateCropInputs()) {
+      return;
+    }
 
     let formData = new FormData(this);
     formData.append("cropCode", $("#cropCode").val());
@@ -59,22 +157,36 @@ $(document).ready(function () {
         Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
       },
       success: function (response) {
-        alert("Crop saved successfully!");
+        Swal.fire(
+          "Save Successfully!",
+          "Crop has been saved successfully.",
+          "success"
+        );
         $("#cropForm")[0].reset();
+        generateCropCode();
       },
-
       error: function (xhr) {
         if (xhr.status === 401) {
-          // Handle session expiration
-          if (confirm("Session expired. Please log in again.")) {
-            window.location.href = "/index.html";
-          }
+          showPopup(
+            "warning",
+            "Session Expired",
+            "Your session has expired. Please log in again.",
+            () => {
+              window.location.href = "/index.html";
+            }
+          );
         } else if (xhr.status === 403) {
-          // Handle insufficient permissions
-          alert("You do not have permission to perform this action.");
+          showPopup(
+            "error",
+            "Permission Denied",
+            "You do not have permission to perform this action."
+          );
         } else {
-          // Handle other errors
-          alert("Error saving crop: " + (xhr.responseText || "An unexpected error occurred."));
+          showPopup(
+            "error",
+            "Error",
+            xhr.responseText || "An unexpected error occurred."
+          );
         }
       },
     });
@@ -110,14 +222,16 @@ $(document).ready(function () {
 
       error: function (xhr) {
         if (xhr.status === 401)
-          // Handle session expiration
           if (confirm("Session expired. Please log in again.")) {
+            // Handle session expiration
             window.location.href = "/index.html";
+          } else {
+            // Handle other errors
+            alert(
+              "Error retrieving field list : " +
+                (xhr.responseText || "An unexpected error occurred.")
+            );
           }
-        else {
-          // Handle other errors
-          alert("Error retrieving crop list: " + (xhr.responseText || "An unexpected error occurred."));
-        }
       },
     });
   });
@@ -136,7 +250,11 @@ $(document).ready(function () {
   function searchAndFillCropForm() {
     const searchTerm = $("#searchCrop").val().trim();
     if (searchTerm === "") {
-      alert("Please enter a crop code or common name.");
+      showPopup(
+        "warning",
+        "Not Found",
+        "Please enter a crop code or common name to search."
+      );
       return;
     }
 
@@ -151,7 +269,8 @@ $(document).ready(function () {
       },
       success: function (data) {
         if (data.length === 0) {
-          alert("No matching crop found.");
+          // alert("No matching crop found.");
+          showPopup("error", "Not Found", "Crop not found. Please try again!.");
           return;
         }
 
@@ -174,20 +293,26 @@ $(document).ready(function () {
 
       error: function (xhr) {
         if (xhr.status === 401)
-          // Handle session expiration
           if (confirm("Session expired. Please log in again.")) {
+            // Handle session expiration
             window.location.href = "/index.html";
+          } else {
+            // Handle other errors
+            alert(
+              "Error searching crop: " +
+                (xhr.responseText || "An unexpected error occurred.")
+            );
           }
-        else {
-          // Handle other errors
-          alert("Error searching crop: " + (xhr.responseText || "An unexpected error occurred."));
-        }
       },
     });
   }
 
   // Update Crop
   $("#updateBtn").on("click", function () {
+    if (!validateCropInputs()) {
+      return;
+    }
+
     let formData = new FormData();
     formData.append("cropCommonName", $("#cropCommonName").val());
     formData.append("cropScientificName", $("#cropScientificName").val());
@@ -210,21 +335,35 @@ $(document).ready(function () {
         Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
       },
       success: function () {
-        alert("Crop updated successfully!");
+        Swal.fire(
+          "Update Successfully!",
+          "Crop has been updated successfully.",
+          "success"
+        );
       },
 
       error: function (xhr) {
         if (xhr.status === 401) {
-          // Handle session expiration
-          if (confirm("Session expired. Please log in again.")) {
-            window.location.href = "/index.html";
-          }
+          showPopup(
+            "warning",
+            "Session Expired",
+            "Your session has expired. Please log in again.",
+            () => {
+              window.location.href = "/index.html";
+            }
+          );
         } else if (xhr.status === 403) {
-          // Handle insufficient permissions
-          alert("You do not have permission to perform this action.");
+          showPopup(
+            "error",
+            "Permission Denied",
+            "You do not have permission to perform this action."
+          );
         } else {
-          // Handle other errors
-          alert("Error updating crop: " + (xhr.responseText || "An unexpected error occurred."));
+          showPopup(
+            "error",
+            "Error",
+            xhr.responseText || "An unexpected error occurred."
+          );
         }
       },
     });
@@ -233,35 +372,56 @@ $(document).ready(function () {
   // Delete Crop
   $("#deleteBtn").on("click", function () {
     const cropCode = $("#cropCode").val();
-    if (confirm("Are you sure you want to delete this crop?")) {
-      $.ajax({
-        url: `http://localhost:5050/crop-monitor/api/v1/crops/${cropCode}`,
-        type: "DELETE",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-        },
-        success: function () {
-          alert("Crop deleted successfully!");
-          $("#cropForm")[0].reset();
-          generateCropCode();
-        },
+    showPopup(
+      "warning",
+      "Confirm Delete",
+      "Are you sure you want to delete this crop?",
+      () => {
+        $.ajax({
+          url: `http://localhost:5050/crop-monitor/api/v1/crops/${cropCode}`,
+          type: "DELETE",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
 
-        error: function (xhr) {
-          if (xhr.status === 401) {
-            // Handle session expiration
-            if (confirm("Session expired. Please log in again.")) {
-              window.location.href = "/index.html";
+          success: function () {
+            Swal.fire(
+              "Delete Successfully!",
+              "Crop has been deleted successfully.",
+              "success"
+            );
+            $("#cropForm")[0].reset();
+            generateCropCode();
+          },
+
+          error: function (xhr) {
+            if (xhr.status === 401) {
+              // Handle session expiration
+              showPopup(
+                "warning",
+                "Session Expired",
+                "Your session has expired. Please log in again.",
+                () => {
+                  window.location.href = "/index.html";
+                }
+              );
+            } else if (xhr.status === 403) {
+              showPopup(
+                "error",
+                "Permission Denied",
+                "You do not have permission to perform this action."
+              );
+            } else {
+              showPopup(
+                "error",
+                "Error",
+                xhr.responseText || "An unexpected error occurred."
+              );
             }
-          } else if (xhr.status === 403) {
-            // Handle insufficient permissions
-            alert("You do not have permission to perform this action.");
-          } else {
-            // Handle other errors
-            alert("Error deleting crop: " + (xhr.responseText || "An unexpected error occurred."));
-          }
-        },
-      });
-    }
+          },
+        });
+      }
+    );
   });
 
   // Clear Crop Form
