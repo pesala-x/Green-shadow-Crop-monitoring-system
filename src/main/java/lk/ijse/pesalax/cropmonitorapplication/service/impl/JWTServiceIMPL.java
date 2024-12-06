@@ -31,7 +31,7 @@ public class JWTServiceIMPL implements JWTService {
         HashMap<String, Object> claims = new HashMap<>();
         claims.put("role", userDetails.getAuthorities());
         Date currentDate = new Date();
-        Date expiredDate = new Date(currentDate.getTime() + 1000 * 60 * 1); //1 minit
+        Date expiredDate = new Date(currentDate.getTime() + 1000 * 60 * 30); //30 minit
         String accessToken = Jwts.builder().setClaims(claims).setSubject(userDetails.getUsername()) // set the "subject" (sub) claim of the JWT
                 .setIssuedAt(currentDate) // set the "issued at" (iat) claim of the JWT
                 .setExpiration(expiredDate) // set the "expiration" (exp) claim of the JWT
