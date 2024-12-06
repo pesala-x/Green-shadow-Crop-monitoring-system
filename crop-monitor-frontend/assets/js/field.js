@@ -217,7 +217,7 @@ $(document).ready(function () {
 
 $(document).ready(function () {
   $("#assigment").click(function () {
-    window.location.href = "gfieldStaffAssign.html";
+    window.location.href = "fieldStaffAssign.html";
   });
 });
 
