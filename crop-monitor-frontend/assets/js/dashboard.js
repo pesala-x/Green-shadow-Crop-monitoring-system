@@ -3,11 +3,11 @@ const lineCtx = document.getElementById("lineChart").getContext("2d");
 new Chart(lineCtx, {
   type: "line",
   data: {
-    labels: ["Jan", "Feb", "Mar", "Apr", "May"],
+    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Juny", "July", "Aug", "Sep", "Oct", "Nov", "Dec"],
     datasets: [
       {
         label: "Yield (kg)",
-        data: [100, 150, 200, 180, 220],
+        data: [100, 180, 200, 180, 120, 240, 246, 130, 180, 200, 200, 188],
         borderColor: "#4bc0c0",
         backgroundColor: "rgba(75, 192, 192, 0.7)",
         fill: true,
