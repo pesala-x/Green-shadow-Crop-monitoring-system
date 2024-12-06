@@ -210,6 +210,18 @@ $(document).ready(function () {
           </tr>
         `);
         });
+
+        // Sort
+        if ($.fn.DataTable.isDataTable("#equipmentList table")) {
+          $("#equipmentList table").DataTable().destroy();
+        }
+        $("#equipmentList table").DataTable({
+          paging: true,
+          searching: true,
+          ordering: true,
+          order: [[0, "asc"]],
+        });
+        $("#equipmentList table").DataTable();
         $("#equipmentListModal").modal("show");
       },
 
