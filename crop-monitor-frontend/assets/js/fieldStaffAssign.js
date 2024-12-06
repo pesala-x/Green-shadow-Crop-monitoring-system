@@ -60,31 +60,43 @@ $(document).ready(function () {
     $("#assignRole").val(role || "");
   });
 
-  // Load all field staff assignments
-  function loadFieldAssignments() {
-    $.ajax({
-      url: "http://localhost:5050/crop-monitor/api/v1/assignment/allassignments",
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-      },
-      success: function (assignments) {
-        $("#assignmentTableBody").empty();
-        assignments.forEach((assignment) => {
-          const row = `<tr>
-            <td>${assignment.fieldCode}</td>
-            <td>${assignment.staffId}</td>
-            <td>${assignment.assignedRole}</td>
-            <td>${assignment.assignmentDate}</td>
-          </tr>`;
-          $("#assignmentTableBody").append(row);
-        });
-      },
-      error: function (xhr) {
-        console.error("Failed to load assignments:", xhr.responseText);
-      },
-    });
-  }
+ // Load all field staff assignments
+ function loadFieldAssignments() {
+  $.ajax({
+    url: "http://localhost:5050/crop-monitor/api/v1/assignment/allassignments",
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+    },
+    success: function (assignments) {
+      $("#assignmentTableBody").empty();
+      assignments.forEach((assignment) => {
+        const row = `<tr>
+          <td>${assignment.fieldCode}</td>
+          <td>${assignment.staffId}</td>
+          <td>${assignment.assignedRole}</td>
+          <td>${assignment.assignmentDate}</td>
+        </tr>`;
+        $("#assignmentTableBody").append(row);
+      });
+
+      // Sort
+      if ($.fn.DataTable.isDataTable("#assignmentTable")) {
+        $("#assignmentTable").DataTable().destroy();
+      }
+      $("#assignmentTable").DataTable({
+        paging: true,
+        searching: true,
+        ordering: true,
+        order: [[3, "asc"]],
+      });
+    },
+    error: function (xhr) {
+      console.error("Failed to load assignments:", xhr.responseText);
+    },
+  });
+}
+
 
   // Validate inputs with SweetAlert popups
   function validateFieldStaffAssignInputs() {
