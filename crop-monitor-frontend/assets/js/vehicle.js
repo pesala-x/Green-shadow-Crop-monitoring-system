@@ -361,6 +361,17 @@ $(document).ready(function () {
           `;
         });
         $("#vehicleTableBody").html(vehicleRows);
+
+        // Sort
+        if ($.fn.DataTable.isDataTable("#cropTable")) {
+          $("#cropTable").DataTable().destroy();
+        }
+        $("#cropTable").DataTable({
+          paging: true,
+          searching: true,
+          ordering: true,
+          order: [[0, "asc"]],
+        });
       },
 
       error: function (xhr) {
