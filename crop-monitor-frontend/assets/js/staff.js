@@ -115,7 +115,7 @@ $(document).ready(function () {
       return false;
     }
 
-    if (!/^[A-Za-z0-9._%+-]+@gmail\.com$/.test(email)) {
+    if (!/^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(email)) {
       showValidationError(
         "Invalid Input",
         "Please enter a valid email address."
