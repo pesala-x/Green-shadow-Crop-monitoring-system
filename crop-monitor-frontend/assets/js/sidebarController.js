@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 function loadSidebar() {
-  fetch("/sidebar.html")
+  fetch("/pages/sidebar.html")
     .then((response) => {
       if (!response.ok) {
         throw new Error("Network response was not ok");
@@ -80,4 +80,25 @@ function loadContent(section) {
       console.error("Error loading content:", error);
     });
 }
+
+// Use event delegation to handle click events on dynamically loaded content
+document.addEventListener("click", function (e) {
+  if (e.target.closest("#sign-out-btn")) {
+    e.preventDefault();
+
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You will be logged out.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, sign out!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        window.location.href = "/index.html";
+      }
+    });
+  }
+});
 
