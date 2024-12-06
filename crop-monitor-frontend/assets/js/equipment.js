@@ -51,9 +51,87 @@ $(document).ready(function () {
     });
   }
 
+  // Function to validate equipment inputs with SweetAlert popups
+  function validateEquipmentInputs() {
+    const equipmentNameInput = $("#equipmentName");
+    const equipmentTypeInput = $("#equipmentType");
+    const statusInput = $("#status");
+    const assignedStaffInput = $("#assignedStaff");
+    const assignedFieldInput = $("#assignedField");
+
+    const equipmentName = equipmentNameInput.val();
+    const equipmentType = equipmentTypeInput.val();
+    const status = statusInput.val();
+    const assignedStaff = assignedStaffInput.val();
+    const assignedField = assignedFieldInput.val();
+
+    // Validate equipment name
+    if (!equipmentName) {
+      showValidationError("Invalid Input", "Equipment Name cannot be empty.");
+      return false;
+    }
+
+    // Validate equipment type
+    if (!equipmentType) {
+      showValidationError("Invalid Input", "Please select an Equipment Type.");
+      return false;
+    }
+
+    // Validate equipment status
+    if (!status) {
+      showValidationError(
+        "Invalid Input",
+        "Please select an Equipment Status."
+      );
+      return false;
+    }
+
+    // Validate assigned staff
+    if (!assignedStaff) {
+      showValidationError("Invalid Input", "Please select Assigned Staff.");
+      return false;
+    }
+
+    // Validate assigned field
+    if (!assignedField) {
+      showValidationError("Invalid Input", "Please select Assigned Field.");
+      return false;
+    }
+
+    return true;
+  }
+
+  function showValidationError(title, text) {
+    Swal.fire({
+      icon: "error",
+      title: title,
+      text: text,
+      footer: '<a href="">Why do I have this issue?</a>',
+    });
+  }
+
+  function showPopup(type, title, text, confirmCallback = null) {
+    Swal.fire({
+      icon: type,
+      title: title,
+      text: text,
+      showCancelButton: !!confirmCallback,
+      confirmButtonText: "OK",
+      cancelButtonText: "Cancel",
+    }).then((result) => {
+      if (result.isConfirmed && confirmCallback) {
+        confirmCallback();
+      }
+    });
+  }
+
   // Save Equipment
   $("#equipmentForm").on("submit", function (e) {
     e.preventDefault();
+
+    if (!validateEquipmentInputs()) {
+      return;
+    }
 
     let formData = new FormData(this);
     formData.append("equipmentId", $("#equipmentId").val());
@@ -73,23 +151,36 @@ $(document).ready(function () {
         Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
       },
       success: function (response) {
-        alert("Equipment saved successfully!");
+        Swal.fire(
+          "Save Successfully!",
+          "Equipment has been saved successfully.",
+          "success"
+        );
         $("#equipmentForm")[0].reset();
-        //
+        generateEquipmentID();
       },
 
       error: function (xhr) {
         if (xhr.status === 401) {
-          // Handle session expiration
-          if (confirm("Session expired. Please log in again.")) {
+          Swal.fire(
+            "Session Expired",
+            "Your session has expired. Please log in again.",
+            "warning"
+          ).then(() => {
             window.location.href = "/index.html";
-          }
+          });
         } else if (xhr.status === 403) {
-          // Handle insufficient permissions
-          alert("You do not have permission to perform this action.");
+          Swal.fire(
+            "Permission Denied",
+            "You do not have permission to perform this action.",
+            "error"
+          );
         } else {
-          // Handle other errors
-          alert("Error saving equipment: " + (xhr.responseText || "An unexpected error occurred."));
+          Swal.fire(
+            "Error",
+            xhr.responseText || "An unexpected error occurred.",
+            "error"
+          );
         }
       },
     });
@@ -123,14 +214,21 @@ $(document).ready(function () {
       },
 
       error: function (xhr) {
-        if (xhr.status === 401)
-          // Handle session expiration
-          if (confirm("Session expired. Please log in again.")) {
-            window.location.href = "/index.html";
-          }
-        else {
-          // Handle other errors
-          alert("Error retrieving equipment list: " + (xhr.responseText || "An unexpected error occurred."));
+        if (xhr.status === 401) {
+          showPopup(
+            "warning",
+            "Session Expired",
+            "Your session has expired. Please log in again.",
+            () => {
+              window.location.href = "/index.html";
+            }
+          );
+        } else {
+          showPopup(
+            "error",
+            "Error",
+            xhr.responseText || "An unexpected error occurred."
+          );
         }
       },
     });
@@ -150,7 +248,11 @@ $(document).ready(function () {
   function searchAndFillEquipmentForm() {
     const searchTerm = $("#searchEquipment").val().trim();
     if (searchTerm === "") {
-      alert("Please enter an equipment code or name.");
+      showPopup(
+        "warning",
+        "Not Found",
+        "Please enter a equipment code or name to search."
+      );
       return;
     }
 
@@ -165,7 +267,11 @@ $(document).ready(function () {
       },
       success: function (data) {
         if (data.length === 0) {
-          alert("No matching equipment found.");
+          showPopup(
+            "warning",
+            "Not Found",
+            "Equipment code not found. Please try again!."
+          );
           return;
         }
 
@@ -179,14 +285,21 @@ $(document).ready(function () {
       },
 
       error: function (xhr) {
-        if (xhr.status === 401)
-          // Handle session expiration
-          if (confirm("Session expired. Please log in again.")) {
-            window.location.href = "/index.html";
-          }
-        else {
-          // Handle other errors
-          alert("Error searching equipment: " + (xhr.responseText || "An unexpected error occurred."));
+        if (xhr.status === 401) {
+          showPopup(
+            "warning",
+            "Session Expired",
+            "Your session has expired. Please log in again.",
+            () => {
+              window.location.href = "/index.html";
+            }
+          );
+        } else {
+          showPopup(
+            "error",
+            "Error",
+            xhr.responseText || "An unexpected error occurred."
+          );
         }
       },
     });
@@ -194,8 +307,10 @@ $(document).ready(function () {
 
   // Update Equipment
   $("#updateBtn").click(function () {
+    if (!validateEquipmentInputs()) {
+      return;
+    }
     const equipmentId = $("#equipmentId").val();
-    if (!equipmentId) return alert("Please enter Equipment Id to update.");
 
     let formData = {
       equipmentName: $("#equipmentName").val(),
@@ -214,22 +329,36 @@ $(document).ready(function () {
         Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
       },
       success: function () {
-        alert("Equipment updated successfully!");
+        Swal.fire(
+          "Update Successfully!",
+          "Equipment has been updated successfully.",
+          "success"
+        );
         clearForm();
       },
 
       error: function (xhr) {
         if (xhr.status === 401) {
-          // Handle session expiration
-          if (confirm("Session expired. Please log in again.")) {
-            window.location.href = "/index.html";
-          }
+          showPopup(
+            "warning",
+            "Session Expired",
+            "Your session has expired. Please log in again.",
+            () => {
+              window.location.href = "/index.html";
+            }
+          );
         } else if (xhr.status === 403) {
-          // Handle insufficient permissions
-          alert("You do not have permission to perform this action.");
+          showPopup(
+            "error",
+            "Permission Denied",
+            "You do not have permission to perform this action."
+          );
         } else {
-          // Handle other errors
-          alert("Error update Equipment: " + (xhr.responseText || "An unexpected error occurred."));
+          showPopup(
+            "error",
+            "Error",
+            xhr.responseText || "An unexpected error occurred."
+          );
         }
       },
     });
@@ -238,34 +367,60 @@ $(document).ready(function () {
   // Delete Equipment
   $("#deleteBtn").click(function () {
     const equipmentId = $("#equipmentId").val();
-    if (!equipmentId) return alert("Please enter Equipment Id to delete.");
 
-    $.ajax({
-      url: `http://localhost:5050/crop-monitor/api/v1/equipment/${equipmentId}`,
-      type: "DELETE",
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-      },
-      success: function () {
-        alert("Equipment deleted successfully!");
-        clearForm();
-      },
+    if (!equipmentId) return;
+    showPopup(
+      "warning",
+      "Not Found",
+      "Please enter a equipment code id to delete."
+    );
+    showPopup(
+      "warning",
+      "Confirm Delete",
+      "Are you sure you want to delete this equipment?",
+      () => {
+        $.ajax({
+          url: `http://localhost:5050/crop-monitor/api/v1/equipment/${equipmentId}`,
+          type: "DELETE",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+          success: function () {
+            Swal.fire(
+              "Delete Successfully!",
+              "Equipment has been deleted successfully.",
+              "success"
+            );
+            clearForm();
+          },
 
-      error: function (xhr) {
-        if (xhr.status === 401) {
-          // Handle session expiration
-          if (confirm("Session expired. Please log in again.")) {
-            window.location.href = "/index.html";
-          }
-        } else if (xhr.status === 403) {
-          // Handle insufficient permissions
-          alert("You do not have permission to perform this action.");
-        } else {
-          // Handle other errors
-          alert("Error delete Equipment: " + (xhr.responseText || "An unexpected error occurred."));
-        }
-      },
-    });
+          error: function (xhr) {
+            if (xhr.status === 401) {
+              showPopup(
+                "warning",
+                "Session Expired",
+                "Your session has expired. Please log in again.",
+                () => {
+                  window.location.href = "/index.html";
+                }
+              );
+            } else if (xhr.status === 403) {
+              showPopup(
+                "error",
+                "Permission Denied",
+                "You do not have permission to perform this action."
+              );
+            } else {
+              showPopup(
+                "error",
+                "Error",
+                xhr.responseText || "An unexpected error occurred."
+              );
+            }
+          },
+        });
+      }
+    );
   });
 
   // Clear form
