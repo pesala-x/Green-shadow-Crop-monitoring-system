@@ -11,8 +11,8 @@ body {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s;
 }
-.cardColor{
-  background-color: black;
+.firstRow:hover{
+  color: #000 !important;
 }
 .card:hover {
   transform: translateY(-10px);
@@ -49,4 +49,14 @@ body {
   border-radius: var(--card-border-radius);
   margin-bottom: var(--section-padding);
   text-align: center;
+}
+
+.card {
+  background-color: transparent !important;
+  border-radius: 10px !important;
+}
+
+.card-body {
+  background-color: transparent !important; /* Ensures the card body is also transparent */
+  border-radius: 10px;
 }
