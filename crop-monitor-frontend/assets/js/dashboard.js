@@ -1,101 +1,93 @@
-// add hovered class in selected list item
-let list = document.querySelectorAll('.navigation li');
-function activeLink(){
-    list.forEach((item) =>
-    item.classList.remove('hovered'));
-    this.classList.add('hovered');
-}
-list.forEach((item) =>
-item.addEventListener('mouseover',activeLink));
-
-// MenuToggle
-let toggle = document.querySelector('.toggle');
-let navigation = document.querySelector('.navigation');
-let main = document.querySelector('.main');
-
-toggle.onclick = function(){
-    navigation.classList.toggle('active');
-    main.classList.toggle('active');
-}
-
-//Polar Chart
-var options = {
-    series: [42, 47, 52, 58, 65],
-    chart: {
-    width: 380,
-    type: 'polarArea'
-  },
-  labels: ['Tomato', 'Carrots', 'Pumpkins', 'Cabbage', 'Potato'],
-  fill: {
-    opacity: 1
-  },
-  stroke: {
-    width: 1,
-    colors: undefined
-  },
-  yaxis: {
-    show: false
-  },
-  legend: {
-    position: 'bottom'
-  },
-  plotOptions: {
-    polarArea: {
-      rings: {
-        strokeWidth: 0
+// Line Chart
+const lineCtx = document.getElementById("lineChart").getContext("2d");
+new Chart(lineCtx, {
+  type: "line",
+  data: {
+    labels: ["Jan", "Feb", "Mar", "Apr", "May"],
+    datasets: [
+      {
+        label: "Yield (kg)",
+        data: [100, 150, 200, 180, 220],
+        borderColor: "#4bc0c0",
+        backgroundColor: "rgba(75, 192, 192, 0.7)",
+        fill: true,
+        tension: 0.4,
       },
-      spokes: {
-        strokeWidth: 0
+    ],
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: "top",
       },
-    }
-  },
-  theme: {
-    monochrome: {
-      enabled: false,
-    }
-  },
-  colors: ['#c26c6f', '#8d99ae', '#ffbf69', '#52b788', '#55596e'],
-  };
-
-  var chart = new ApexCharts(document.querySelector("#polar-chart"), options);
-  chart.render();
-
-// line Chart
-var options = {
-    series: [{
-            name: "Potato",
-            data: [10, 41, 35, 51, 49, 62, 69, 91, 148]
-    }],
-    chart: {
-          height: 350,
-          type: 'line',
-          zoom: {
-            enabled: false
-    }
-        },
-        dataLabels: {
-          enabled: false
-        },
-        stroke: {
-          curve: 'straight'
-        },
+    },
+    scales: {
+      x: {
         title: {
-          text: 'Potato by Month',
-          align: 'left'
+          display: true,
+          text: "Month",
         },
-        grid: {
-          row: {
-            colors: ['#fff', 'transparent'],
-            opacity: 0.5
-          },
+      },
+      y: {
+        title: {
+          display: true,
+          text: "Yield (kg)",
         },
-        xaxis: {
-          categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep'],
-        },
-        colors: ['#375534']
-};
+      },
+    },
+  },
+});
 
-var chart = new ApexCharts(document.querySelector("#line-chart"), options);
-chart.render();
+// Bar Chart
+const barCtx2 = document.getElementById("barChart2").getContext("2d");
+new Chart(barCtx2, {
+  type: "bar",
+  data: {
+    labels: ["Field 1", "Field 2", "Field 3", "Field 4"],
+    datasets: [
+      {
+        label: "Performance Score",
+        data: [75, 90, 80, 95],
+        backgroundColor: ["#ff6384", "#36a2eb", "#ffce56", "#4bc0c0"],
+      },
+    ],
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: {
+        display: true,
+        position: "top",
+      },
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+      },
+    },
+  },
+});
 
-
+// Pie Chart
+const pieCtx2 = document.getElementById("pieChart2").getContext("2d");
+new Chart(pieCtx2, {
+  type: "pie",
+  data: {
+    labels: ["Fertilizers", "Pesticides", "Water"],
+    datasets: [
+      {
+        data: [40, 30, 30],
+        backgroundColor: ["#ff6384", "#36a2eb", "#ffce56"],
+      },
+    ],
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: "top",
+      },
+    },
+  },
+});
