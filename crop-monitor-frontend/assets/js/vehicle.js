@@ -6,9 +6,100 @@ $(document).ready(function () {
   }
   generateVehicleCode();
 
+  // Utility function to check if the first letter is capitalized
+  function isFirstLetterCapitalized(text) {
+    return /^[A-Z]/.test(text);
+  }
+
+  // Function to validate vehicle inputs with SweetAlert popups
+  function validateVehicleInputs() {
+    const vehicleCodeInput = $("#vehicleCode");
+    const licensePlateInput = $("#licensePlate");
+    const vehicleCategoryInput = $("#vehicleCategory");
+    const fuelTypeInput = $("#fuelType");
+    const statusInput = $("#status");
+
+    const vehicleCode = vehicleCodeInput.val().trim();
+    const licensePlate = licensePlateInput.val().trim();
+    const vehicleCategory = vehicleCategoryInput.val();
+    const fuelType = fuelTypeInput.val();
+    const status = statusInput.val();
+
+    // Validate vehicle code
+    if (!vehicleCode) {
+      showValidationError("Invalid Input", "Vehicle Code cannot be empty.");
+      return false;
+    }
+
+    // Validate license plate
+    if (!licensePlate) {
+      showValidationError("Invalid Input", "License Plate cannot be empty.");
+      return false;
+    }
+    if (!isFirstLetterCapitalized(licensePlate)) {
+      showValidationError(
+        "Invalid Input",
+        "License Plate must start with a capital letter."
+      );
+      return false;
+    }
+
+    // Validate vehicle category
+    if (!vehicleCategory) {
+      showValidationError(
+        "Invalid Input",
+        "Please select a valid vehicle category."
+      );
+      return false;
+    }
+
+    // Validate fuel type
+    if (!fuelType) {
+      showValidationError("Invalid Input", "Please select a fuel type.");
+      return false;
+    }
+
+    // Validate status
+    if (!status) {
+      showValidationError("Invalid Input", "Please select a status.");
+      return false;
+    }
+
+    return true;
+  }
+
+  // Show validation error using SweetAlert
+  function showValidationError(title, text) {
+    Swal.fire({
+      icon: "error",
+      title: title,
+      text: text,
+      footer: '<a href="">Why do I have this issue?</a>',
+    });
+  }
+
+  function showPopup(type, title, text, confirmCallback = null) {
+    Swal.fire({
+      icon: type,
+      title: title,
+      text: text,
+      showCancelButton: !!confirmCallback,
+      confirmButtonText: "OK",
+      cancelButtonText: "Cancel",
+    }).then((result) => {
+      if (result.isConfirmed && confirmCallback) {
+        confirmCallback();
+      }
+    });
+  }
+
   // save vehicle
   $("#vehicleForm").on("submit", function (e) {
     e.preventDefault();
+
+    if (!validateVehicleInputs()) {
+      return;
+    }
 
     let formData = new FormData(this);
     formData.append("vehicleCode", $("#vehicleCode").val());
@@ -28,23 +119,37 @@ $(document).ready(function () {
         Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
       },
       success: function (response) {
-        alert("Vehicle saved successfully!");
+        Swal.fire(
+          "Save Successfully!",
+          "Vehicle has been saved successfully.",
+          "success"
+        );
         $("#vehicleForm")[0].reset();
         generateVehicleCode();
       },
 
       error: function (xhr) {
         if (xhr.status === 401) {
-          // Handle session expiration
-          if (confirm("Session expired. Please log in again.")) {
-            window.location.href = "/index.html";
-          }
+          showPopup(
+            "warning",
+            "Session Expired",
+            "Your session has expired. Please log in again.",
+            () => {
+              window.location.href = "/index.html";
+            }
+          );
         } else if (xhr.status === 403) {
-          // Handle insufficient permissions
-          alert("You do not have permission to perform this action.");
+          showPopup(
+            "error",
+            "Permission Denied",
+            "You do not have permission to perform this action."
+          );
         } else {
-          // Handle other errors
-          alert("Error saving vehicle: " + (xhr.responseText || "An unexpected error occurred."));
+          showPopup(
+            "error",
+            "Error",
+            xhr.responseText || "An unexpected error occurred."
+          );
         }
       },
     });
@@ -64,7 +169,11 @@ $(document).ready(function () {
   function searchAndFillVehicleForm() {
     const searchTerm = $("#searchVehicle").val().trim();
     if (searchTerm === "") {
-      alert("Please enter a Vehicle Code or License Plate Number.");
+      showPopup(
+        "warning",
+        "Not Found",
+        "Please enter a Vehicle code or License Plate to search."
+      );
       return;
     }
 
@@ -79,7 +188,11 @@ $(document).ready(function () {
       },
       success: function (data) {
         if (data.length === 0) {
-          alert("No matching vehicle found.");
+          showPopup(
+            "error",
+            "Not Found",
+            "vehicle not found. Please try again!."
+          );
           return;
         }
 
@@ -93,14 +206,21 @@ $(document).ready(function () {
       },
 
       error: function (xhr) {
-        if (xhr.status === 401)
-          // Handle session expiration
-          if (confirm("Session expired. Please log in again.")) {
-            window.location.href = "/index.html";
-          }
-        else {
-          // Handle other errors
-          alert("Error retrieving vehicle data : " + (xhr.responseText || "An unexpected error occurred."));
+        if (xhr.status === 401) {
+          showPopup(
+            "warning",
+            "Session Expired",
+            "Your session has expired. Please log in again.",
+            () => {
+              window.location.href = "/index.html";
+            }
+          );
+        } else {
+          showPopup(
+            "error",
+            "Error",
+            xhr.responseText || "An unexpected error occurred."
+          );
         }
       },
     });
@@ -108,9 +228,10 @@ $(document).ready(function () {
 
   // Update vehicle
   $("#updateBtn").click(function () {
+    if (!validateVehicleInputs()) {
+      return;
+    }
     const vehicleCode = $("#vehicleCode").val();
-    if (!vehicleCode) return alert("Please enter Vehicle Code to update.");
-
     let formData = {
       licensePlateNumber: $("#licensePlate").val(),
       vehicleCategory: $("#vehicleCategory").val(),
@@ -128,22 +249,37 @@ $(document).ready(function () {
         Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
       },
       success: function () {
-        alert("Vehicle updated successfully!");
+        // alert("Vehicle updated successfully!");
+        Swal.fire(
+          "Update Successfully!",
+          "Vehicle has been updated successfully.",
+          "success"
+        );
         clearForm();
       },
 
       error: function (xhr) {
         if (xhr.status === 401) {
-          // Handle session expiration
-          if (confirm("Session expired. Please log in again.")) {
-            window.location.href = "/index.html";
-          }
+          showPopup(
+            "warning",
+            "Session Expired",
+            "Your session has expired. Please log in again.",
+            () => {
+              window.location.href = "/index.html";
+            }
+          );
         } else if (xhr.status === 403) {
-          // Handle insufficient permissions
-          alert("You do not have permission to perform this action.");
+          showPopup(
+            "error",
+            "Permission Denied",
+            "You do not have permission to perform this action."
+          );
         } else {
-          // Handle other errors
-          alert("Error update vehicle: " + (xhr.responseText || "An unexpected error occurred."));
+          showPopup(
+            "error",
+            "Error",
+            xhr.responseText || "An unexpected error occurred."
+          );
         }
       },
     });
@@ -152,34 +288,54 @@ $(document).ready(function () {
   // Delete vehicle
   $("#deleteBtn").click(function () {
     const vehicleCode = $("#vehicleCode").val();
-    if (!vehicleCode) return alert("Please enter Vehicle Code to delete.");
+    showPopup(
+      "warning",
+      "Confirm Delete",
+      "Are you sure you want to delete this field?",
+      () => {
+        $.ajax({
+          url: `http://localhost:5050/crop-monitor/api/v1/vehicles/${vehicleCode}`,
+          type: "DELETE",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
 
-    $.ajax({
-      url: `http://localhost:5050/crop-monitor/api/v1/vehicles/${vehicleCode}`,
-      type: "DELETE",
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-      },
-      success: function () {
-        alert("Vehicle deleted successfully!");
-        clearForm();
-      },
+          success: function () {
+            Swal.fire(
+              "Delete Successfully!",
+              "Vehicle has been deleted successfully.",
+              "success"
+            );
+            clearForm();
+          },
 
-      error: function (xhr) {
-        if (xhr.status === 401) {
-          // Handle session expiration
-          if (confirm("Session expired. Please log in again.")) {
-            window.location.href = "/index.html";
-          }
-        } else if (xhr.status === 403) {
-          // Handle insufficient permissions
-          alert("You do not have permission to perform this action.");
-        } else {
-          // Handle other errors
-          alert("Error delete vehicle: " + (xhr.responseText || "An unexpected error occurred."));
-        }
-      },
-    });
+          error: function (xhr) {
+            if (xhr.status === 401) {
+              showPopup(
+                "warning",
+                "Session Expired",
+                "Your session has expired. Please log in again.",
+                () => {
+                  window.location.href = "/index.html";
+                }
+              );
+            } else if (xhr.status === 403) {
+              showPopup(
+                "error",
+                "Permission Denied",
+                "You do not have permission to perform this action."
+              );
+            } else {
+              showPopup(
+                "error",
+                "Error",
+                xhr.responseText || "An unexpected error occurred."
+              );
+            }
+          },
+        });
+      }
+    );
   });
 
   // Get all vehicles
@@ -208,14 +364,21 @@ $(document).ready(function () {
       },
 
       error: function (xhr) {
-        if (xhr.status === 401)
-          // Handle session expiration
-          if (confirm("Session expired. Please log in again.")) {
-            window.location.href = "/index.html";
-          }
-        else {
-          // Handle other errors
-          alert("Failed to fetch vehicles : " + (xhr.responseText || "An unexpected error occurred."));
+        if (xhr.status === 401) {
+          showPopup(
+            "warning",
+            "Session Expired",
+            "Your session has expired. Please log in again.",
+            () => {
+              window.location.href = "/index.html";
+            }
+          );
+        } else {
+          showPopup(
+            "error",
+            "Error",
+            xhr.responseText || "An unexpected error occurred."
+          );
         }
       },
     });
