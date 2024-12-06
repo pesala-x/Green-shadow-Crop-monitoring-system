@@ -2,7 +2,7 @@ $(document).ready(function () {
   // Load fields into the "fieldCode" dropdown
   function loadFieldsToDropdown() {
     $.ajax({
-      url: "http://localhost:5050/cropmonitoring/api/v1/fields/allFields", // Endpoint to fetch fields
+      url: "http://localhost:5050/crop-monitor/api/v1/fields/allFields",
       method: "GET",
       headers: {
         Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
@@ -11,7 +11,6 @@ $(document).ready(function () {
         $("#fieldCode")
           .empty()
           .append("<option disabled selected>Select Field</option>");
-
         fields.forEach((field) => {
           $("#fieldCode").append(
             new Option(
@@ -26,13 +25,12 @@ $(document).ready(function () {
       },
     });
   }
-
   loadFieldsToDropdown();
 
   // Load staff into the "staffId" dropdown
   function loadStaffToDropdown() {
     $.ajax({
-      url: "http://localhost:5050/cropmonitoring/api/v1/staff/allstaff", // Endpoint to fetch staff
+      url: "http://localhost:5050/crop-monitor/api/v1/staff/allstaff",
       method: "GET",
       headers: {
         Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
@@ -41,7 +39,6 @@ $(document).ready(function () {
         $("#staffId")
           .empty()
           .append("<option disabled selected>Select Staff</option>");
-
         staff.forEach((member) => {
           $("#staffId").append(
             new Option(`${member.firstName} (${member.id})`, member.id)
@@ -54,66 +51,78 @@ $(document).ready(function () {
       },
     });
   }
-
   loadStaffToDropdown();
 
-  // Event listener to update the assigned role when a staff member is selected
+  // Event listener to update the assigned role when staff member is selected
   $("#staffId").on("change", function () {
     const selectedOption = $(this).find(":selected");
     const role = selectedOption.data("role");
     $("#assignRole").val(role || "");
   });
 
-  // Date
+  // Load all field staff assignments
+  function loadFieldAssignments() {
+    $.ajax({
+      url: "http://localhost:5050/crop-monitor/api/v1/assignment/allassignments",
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
+      success: function (assignments) {
+        $("#assignmentTableBody").empty();
+        assignments.forEach((assignment) => {
+          const row = `<tr>
+            <td>${assignment.fieldCode}</td>
+            <td>${assignment.staffId}</td>
+            <td>${assignment.assignedRole}</td>
+            <td>${assignment.assignmentDate}</td>
+          </tr>`;
+          $("#assignmentTableBody").append(row);
+        });
+      },
+      error: function (xhr) {
+        console.error("Failed to load assignments:", xhr.responseText);
+      },
+    });
+  }
+
+  // Validate inputs with SweetAlert popups
+  function validateFieldStaffAssignInputs() {
+    const fieldCodeInput = $("#fieldCode").val();
+    const staffIdInput = $("#staffId").val();
+
+    if (!fieldCodeInput) {
+      Swal.fire("Invalid Input", "Please select a field season.", "error");
+      return false;
+    }
+    if (!staffIdInput) {
+      Swal.fire("Invalid Input", "Please select a staff.", "error");
+      return false;
+    }
+
+    return true;
+  }
+
   const today = new Date().toISOString().split("T")[0];
   $("#assignmentDate").val(today);
 
   $("#assignmentAdd").on("click", function () {
     $("#staffAssignmentModal").modal("show");
+    loadFieldsToDropdown();
+    loadStaffToDropdown();
   });
-});
 
-// Load all field staff assignments
-function loadFieldAssignments() {
-  $.ajax({
-    url: "http://localhost:5050/cropmonitoring/api/v1/assignment/allassignments", // Endpoint to get assignments
-    method: "GET",
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-    },
-    success: function (assignments) {
-      // Clear the table body
-      $("#assignmentTableBody").empty();
+  // save fieldStaffAssign
+  $("#saveAssignmentBtn").on("click", function () {
+    if (!validateFieldStaffAssignInputs()) {
+      return;
+    }
 
-      // Append each assignment as a row
-      assignments.forEach(function (assignment) {
-        const row = `<tr>
-                      <td>${assignment.fieldCode}</td>
-                      <td>${assignment.staffId}</td>
-                      <td>${assignment.assignedRole}</td>
-                      <td>${assignment.assignmentDate}</td>
-                    </tr>`;
-        $("#assignmentTableBody").append(row);
-      });
-    },
-    error: function (xhr) {
-      console.error("Failed to load assignments:", xhr.responseText);
-      alert("Failed to load assignments!");
-    },
-  });
-}
-
-$(document).ready(function () {
-  // Initial load of assignments
-  loadFieldAssignments();
-
-  // Save functionality
-  $(".btn-success").on("click", function () {
     const assignmentData = {
       fieldCode: $("#fieldCode").val(),
       staffId: $("#staffId").val(),
       assignedRole: $("#assignRole").val(),
-      assignmentDate: $("#assignmentDate").val(), // Include the date
+      assignmentDate: $("#assignmentDate").val(),
     };
 
     $.ajax({
@@ -124,14 +133,26 @@ $(document).ready(function () {
         "Content-Type": "application/json",
       },
       data: JSON.stringify(assignmentData),
-      success: function (response) {
+      success: function () {
+        Swal.fire("Success", "Assignment saved successfully!", "success");
+
         $("#staffAssignmentModal").modal("hide");
-        // Trigger refresh of assignments table
+
+        $("#fieldCode").val("Select Field");
+        $("#staffId").val("Select Staff");
+        $("#assignRole").val("");
+
         loadFieldAssignments();
       },
       error: function (xhr) {
-        console.error("Failed to save assignment:", xhr.responseText);
+        Swal.fire(
+          "Error",
+          xhr.responseText || "An unexpected error occurred.",
+          "error"
+        );
       },
     });
   });
+
+  loadFieldAssignments();
 });
