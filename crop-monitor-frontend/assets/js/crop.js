@@ -192,49 +192,61 @@ $(document).ready(function () {
     });
   });
 
-  // Get All Crops
-  $("#getAllBtn").on("click", function () {
-    $.ajax({
-      url: "http://localhost:5050/crop-monitor/api/v1/crops/allcrops",
-      type: "GET",
-      contentType: "application/json",
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-      },
-      success: function (data) {
-        let tableBody = $("#cropTableBody");
-        tableBody.empty();
-        data.forEach((crop) => {
-          tableBody.append(`
-          <tr>
-            <td>${crop.cropCode}</td>
-            <td>${crop.cropCommonName}</td>
-            <td>${crop.cropScientificName}</td>
-            <td>${crop.category}</td>
-            <td>${crop.cropSeason}</td>
-            <td>${crop.fieldCode}</td>
-            <td><img src="data:image/png;base64,${crop.cropImage}" alt="Crop Image" style="max-height: 50px;"></td>
-          </tr>
-        `);
-        });
-        $("#cropListModal").modal("show");
-      },
+    // Get All Crops
+    $("#getAllBtn").on("click", function () {
+      $.ajax({
+        url: "http://localhost:5050/crop-monitor/api/v1/crops/allcrops",
+        type: "GET",
+        contentType: "application/json",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+        success: function (data) {
+          let tableBody = $("#cropTableBody");
+          tableBody.empty();
+          data.forEach((crop) => {
+            tableBody.append(`
+            <tr>
+              <td>${crop.cropCode}</td>
+              <td>${crop.cropCommonName}</td>
+              <td>${crop.cropScientificName}</td>
+              <td>${crop.category}</td>
+              <td>${crop.cropSeason}</td>
+              <td>${crop.fieldCode}</td>
+              <td><img src="data:image/png;base64,${crop.cropImage}" alt="Crop Image" style="max-height: 50px;"></td>
+            </tr>
+          `);
+          });
 
-      error: function (xhr) {
-        if (xhr.status === 401)
-          if (confirm("Session expired. Please log in again.")) {
-            // Handle session expiration
-            window.location.href = "/index.html";
-          } else {
-            // Handle other errors
-            alert(
-              "Error retrieving field list : " +
-                (xhr.responseText || "An unexpected error occurred.")
-            );
+          // Sort
+          if ($.fn.DataTable.isDataTable("#cropList table")) {
+            $("#cropList table").DataTable().destroy();
           }
-      },
+          $("#cropList table").DataTable({
+            paging: true,
+            searching: true,
+            ordering: true,
+            order: [[0, "asc"]],
+          });
+          $("#cropList table").DataTable();
+          $("#cropListModal").modal("show");
+        },
+
+        error: function (xhr) {
+          if (xhr.status === 401)
+            if (confirm("Session expired. Please log in again.")) {
+              // Handle session expiration
+              window.location.href = "/index.html";
+            } else {
+              // Handle other errors
+              alert(
+                "Error retrieving field list : " +
+                  (xhr.responseText || "An unexpected error occurred.")
+              );
+            }
+        },
+      });
     });
-  });
 
   // search crop
   $("#searchIcon").on("click", function () {
