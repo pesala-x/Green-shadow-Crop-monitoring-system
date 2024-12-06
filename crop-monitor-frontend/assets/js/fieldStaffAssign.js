@@ -145,11 +145,28 @@ $(document).ready(function () {
         loadFieldAssignments();
       },
       error: function (xhr) {
-        Swal.fire(
-          "Error",
-          xhr.responseText || "An unexpected error occurred.",
-          "error"
-        );
+        if (xhr.status === 401) {
+          showPopup(
+            "warning",
+            "Session Expired",
+            "Your session has expired. Please log in again.",
+            () => {
+              window.location.href = "/index.html";
+            }
+          );
+        } else if (xhr.status === 403) {
+          showPopup(
+            "error",
+            "Permission Denied",
+            "You do not have permission to perform this action."
+          );
+        } else {
+          showPopup(
+            "error",
+            "Error",
+            xhr.responseText || "An unexpected error occurred."
+          );
+        }
       },
     });
   });
